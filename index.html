@@ -114,6 +114,24 @@
       transform: translateY(0) scale(0.97);
     }
 
+    .closed-msg {
+      font-size: 0.88rem;
+      font-style: italic;
+      color: var(--mid);
+      line-height: 1.7;
+      max-width: 240px;
+      margin-top: 0.2rem;
+    }
+    .closed-msg a {
+      color: var(--dark);
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .closed-msg a:hover {
+      color: var(--mid);
+    }
+
     .social-links {
       display: flex;
       gap: 1rem;
@@ -142,12 +160,11 @@
       <img src="images/pool plates.jpeg" alt="mintyrachel ceramic pool plates" />
     </div>
     <div class="info-side">
-      <p class="eyebrow">preorders open</p>
+      <p class="eyebrow">preorders closed</p>
       <h1>minty<em>rachel</em></h1>
       <p class="tagline">small-batch, handmade ceramics</p>
-      <a class="preorder-btn"
-         href="https://docs.google.com/forms/d/e/1FAIpQLSc6E4O8FE02kdl-y7pU_aRoK2sJOuYRRBC8yM_7F6eJQtblBA/viewform"
-         target="_blank">place a preorder ♡</a>
+      <p class="closed-msg">this batch is sold out — follow along on <a href="https://instagram.com/mintyrachel" target="_blank">instagram</a> or <a href="https://patreon.com/mintyrachel?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink" target="_blank">patreon</a> to be the first to know about the next one ♡</p>
+      <p class="closed-msg">a shop is coming soon — stay tuned!</p>
 
       <div class="social-links">
         <!-- Instagram -->
