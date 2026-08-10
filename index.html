@@ -468,56 +468,47 @@
       .social-feed { flex-direction: column; align-items: center; }
       .social-feed-item { width: 100%; max-width: 400px; }
     }
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.4rem;
-    }
-    .gallery-card {
-      border-radius: 16px;
-      overflow: hidden;
-      background: var(--panel);
-      box-shadow: 0 4px 18px rgba(92,36,56,0.10);
-      transition: transform 0.22s, box-shadow 0.22s;
-    }
-    .gallery-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 28px rgba(92,36,56,0.16);
-    }
-    .card-photo {
-      aspect-ratio: 1;
-      overflow: hidden;
-    }
-    .card-photo img {
-      width: 100%; height: 100%;
-      object-fit: cover; display: block;
-      transition: transform 0.30s;
-    }
-    .gallery-card:hover .card-photo img { transform: scale(1.04); }
-    .card-photo.placeholder {
+    .video-feed {
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 2.5rem;
+      padding: 2rem 1rem 3rem;
+    }
+    .video-feed-item {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.14);
+    }
+    .video-feed-item video {
+      display: block;
+      width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+    }
+    .feed-play-btn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.45);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      color: var(--mid);
-      font-size: 0.75rem;
-      font-style: italic;
-      background: rgba(160,80,96,0.06);
+      z-index: 2;
+      padding: 0;
+      transition: background 0.15s;
     }
-    .card-photo.placeholder .icon { font-size: 2rem; }
-    .card-caption { padding: 0.9rem 1.1rem 1rem; }
-    .card-caption h3 {
-      font-size: 0.90rem;
-      font-weight: 700;
-      color: var(--dark);
-      margin-bottom: 0.2rem;
-    }
-    .card-caption p {
-      font-size: 0.76rem;
-      font-style: italic;
-      color: var(--mid);
-    }
+    .feed-play-btn:hover { background: rgba(0,0,0,0.65); }
+    .feed-play-btn svg { width: 12px; height: 12px; fill: white; display: block; }
 
 
     /* ── SHOP ── */
@@ -971,40 +962,37 @@
   <!-- ══════════════════════ CERAMICS ══════════════════════ -->
   <section id="tab-ceramics" class="tab-panel hidden">
 
-    <div class="page-wrap">
-      <div class="gallery-grid">
+    <div class="video-feed">
 
-        <div class="gallery-card">
-          <div class="card-photo placeholder"><span class="icon">🫙</span><span>add photo</span></div>
-          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
-        </div>
-
-        <div class="gallery-card">
-          <div class="card-photo placeholder"><span class="icon">🫙</span><span>add photo</span></div>
-          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
-        </div>
-
-        <div class="gallery-card">
-          <div class="card-photo placeholder"><span class="icon">🍵</span><span>add photo</span></div>
-          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
-        </div>
-
-        <div class="gallery-card">
-          <div class="card-photo placeholder"><span class="icon">🍽️</span><span>add photo</span></div>
-          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
-        </div>
-
-        <div class="gallery-card">
-          <div class="card-photo placeholder"><span class="icon">🌸</span><span>add photo</span></div>
-          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
-        </div>
-
-        <div class="gallery-card">
-          <div class="card-photo placeholder"><span class="icon">🌿</span><span>add photo</span></div>
-          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
-        </div>
-
+      <div class="video-feed-item">
+        <video src="images/ceramics.mp4" muted playsinline loop></video>
+        <button class="feed-play-btn" aria-label="Pause">
+          <svg viewBox="0 0 10 12"><rect x="0" y="0" width="3.5" height="12"/><rect x="6.5" y="0" width="3.5" height="12"/></svg>
+        </button>
       </div>
+
+      <div class="video-feed-item">
+        <img src="images/starmug.jpg" alt="Star mug" style="width:100%;display:block;max-height:80vh;object-fit:contain;"/>
+      </div>
+
+      <div class="video-feed-item">
+        <video src="images/snoopyFINAL.mp4" muted playsinline loop></video>
+        <button class="feed-play-btn" aria-label="Pause">
+          <svg viewBox="0 0 10 12"><rect x="0" y="0" width="3.5" height="12"/><rect x="6.5" y="0" width="3.5" height="12"/></svg>
+        </button>
+      </div>
+
+      <div class="video-feed-item">
+        <img src="images/flowerplate.jpg" alt="Plates" style="width:100%;display:block;max-height:80vh;object-fit:contain;"/>
+      </div>
+
+      <div class="video-feed-item">
+        <video src="images/brunson.mp4" muted playsinline loop></video>
+        <button class="feed-play-btn" aria-label="Pause">
+          <svg viewBox="0 0 10 12"><rect x="0" y="0" width="3.5" height="12"/><rect x="6.5" y="0" width="3.5" height="12"/></svg>
+        </button>
+      </div>
+
     </div>
 
     <div class="social-feed-wrap">
@@ -1132,6 +1120,46 @@
     if (path !== 'home' && document.getElementById('tab-' + path)) {
       switchTab(path);
     }
+
+    // Scroll-triggered video playback + play/pause buttons
+    (function() {
+      const PLAY_ICON  = '<svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg>';
+      const PAUSE_ICON = '<svg viewBox="0 0 10 12"><rect x="0" y="0" width="3.5" height="12"/><rect x="6.5" y="0" width="3.5" height="12"/></svg>';
+
+      function setBtn(btn, playing) {
+        btn.innerHTML = playing ? PAUSE_ICON : PLAY_ICON;
+        btn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+      }
+
+      const items = document.querySelectorAll('.video-feed-item');
+      items.forEach(item => {
+        const vid = item.querySelector('video');
+        const btn = item.querySelector('.feed-play-btn');
+        if (!vid || !btn) return;
+
+        btn.addEventListener('click', () => {
+          if (vid.paused) { vid.play().catch(() => {}); setBtn(btn, true); }
+          else            { vid.pause();                 setBtn(btn, false); }
+        });
+      });
+
+      const feedVideos = document.querySelectorAll('.video-feed-item video');
+      if (!feedVideos.length) return;
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const vid = entry.target;
+          const btn = vid.closest('.video-feed-item').querySelector('.feed-play-btn');
+          if (entry.isIntersecting) {
+            vid.play().catch(() => {});
+            if (btn) setBtn(btn, true);
+          } else {
+            vid.pause();
+            if (btn) setBtn(btn, false);
+          }
+        });
+      }, { threshold: 0.6 });
+      feedVideos.forEach(v => observer.observe(v));
+    })();
 
     // Play button → fullscreen pottery wheel
     (function() {
