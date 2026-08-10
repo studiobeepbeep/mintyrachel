@@ -3,188 +3,1025 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mintyrachel — ceramic preorders</title>
+  <title>mintyrachel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" />
   <style>
+    @font-face {
+      font-family: 'Dirtyline';
+      src: url('fonts/dirtyline.woff2') format('woff2'),
+           url('fonts/dirtyline.woff')  format('woff');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:   #f7c5c5;
-      --dark: #5c2438;
-      --mid:  #a05060;
+      --bg:    #f7c5c5;
+      --dark:  #5c2438;
+      --mid:   #a05060;
+      --panel: #fff0f2;
+      --fade:  rgba(247,197,197,0.45);
     }
 
     body {
       font-family: 'Lora', serif;
       background: var(--bg);
       color: var(--dark);
-      height: 100vh;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
       display: flex;
       align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      justify-content: space-between;
+      padding: 1.1rem 2.5rem;
+      background: var(--panel);
+      box-shadow: 0 2px 16px rgba(92,36,56,0.09);
     }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      width: min(860px, 94vw);
-      height: min(540px, 88vh);
-      border-radius: 28px;
-      box-shadow: 0 16px 48px rgba(92, 36, 56, 0.22);
+    .brand {
+      font-family: 'Dirtyline', serif;
+      font-size: 1.9rem;
+      font-weight: normal;
+      font-style: normal;
+      color: var(--dark);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+      line-height: 1;
     }
-
-    /* photo */
-    .photo-side {
+    .brand:hover { color: var(--mid); }
+    .nav-tabs { display: flex; gap: 2.2rem; }
+    .nav-link {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--mid);
+      transition: color 0.2s;
       position: relative;
-      height: 100%;
-      border-radius: 28px 0 0 28px;
-      overflow: hidden;
+      padding-bottom: 2px;
     }
-    .photo-side img {
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 1.5px;
+      background: var(--dark);
+      transform: scaleX(0);
+      transition: transform 0.2s;
+    }
+    .nav-link:hover { color: var(--dark); }
+    .nav-link.active { color: var(--dark); }
+    .nav-link.active::after,
+    .nav-link:hover::after { transform: scaleX(1); }
+
+    /* ── TAB PANELS ── */
+    .tab-panel { display: block; }
+    .tab-panel.hidden { display: none; }
+
+    /* ── HOME: POTTERY WHEEL ── */
+    .home-footer {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      padding: 1.6rem 2rem;
+      background: var(--panel);
+    }
+    .home-footer a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: var(--mid);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .home-footer a:hover { color: var(--dark); transform: translateY(-2px); }
+    .home-footer svg { width: 20px; height: 20px; }
+    /* ── HOME: COMPUTER PHOTO FRAME ── */
+    .monitor-scene {
+      position: relative;
+      line-height: 0;
+    }
+    .monitor-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1999 / 1020;
+    }
+    .monitor-svg {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      display: block;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .monitor-iframe {
+      position: absolute;
+      top: 25.3%;
+      left: 24.5%;
+      width: 28.8%;
+      height: 42.1%;
+      border: none;
+      z-index: 1;
+    }
+    /* CRT scanlines + vignette over the screen */
+    .screen-fx {
+      position: absolute;
+      top: 25.3%;
+      left: 24.5%;
+      width: 28.8%;
+      height: 42.1%;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .screen-fx::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 2px,
+        rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
+      );
+    }
+    .screen-fx::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,0.45) 100%);
+    }
+    .monitor-frame { transition: opacity 0.5s ease; }
+    .play-screen {
+      position: absolute;
+      top: 25.3%; left: 24.5%; width: 28.8%; height: 42.1%;
+      z-index: 6; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      animation: playscreenin 0.7s ease 4s both;
+    }
+    @keyframes playscreenin {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .play-btn {
+      width: clamp(40px, 5vw, 80px);
+      height: clamp(40px, 5vw, 80px);
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
+      animation: playblink 1.8s ease-in-out infinite;
+    }
+    @keyframes playblink {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.3; transform: scale(0.92); }
+    }
+    .wheel-fullscreen {
+      position: absolute; inset: 0; z-index: 10;
+      background: #000;
+      opacity: 0; pointer-events: none;
+      transform: scale(0.15);
+      transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+    }
+    .wheel-fullscreen.active { opacity: 1; pointer-events: all; transform: scale(1); }
+    .wheel-fullscreen iframe { width: 100%; height: 100%; border: none; }
+    .close-wheel {
+      position: absolute; top: 16px; right: 20px;
+      background: rgba(255,255,255,0.12); color: #fff;
+      border: 1px solid rgba(255,255,255,0.25); border-radius: 50%;
+      width: 36px; height: 36px; cursor: pointer; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+    }
+    /* About Me */
+    .about-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 4rem;
+      align-items: start;
+      margin-top: 1rem;
+    }
+    .about-photo {
+      aspect-ratio: 3 / 4;
+      border-radius: 20px;
+      background: var(--panel);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.6rem;
+      color: var(--mid); font-size: 0.8rem; font-style: italic;
+      box-shadow: 0 8px 28px rgba(92,36,56,0.10);
+    }
+    .about-photo .icon { font-size: 2.5rem; }
+    .about-text { display: flex; flex-direction: column; gap: 1.6rem; padding-top: 0.5rem; }
+    .about-text h2 { font-size: clamp(2rem,4.5vw,3rem); font-weight: 700; font-style: italic; line-height: 1.05; }
+    .about-bio {
+      background: var(--panel); border-radius: 16px;
+      padding: 1.6rem 1.8rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .about-bio p { font-size: 0.93rem; line-height: 1.85; color: var(--dark); font-style: italic; }
+    .about-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .about-tag {
+      font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700;
+      background: var(--bg); color: var(--dark);
+      border-radius: 20px; padding: 0.35rem 0.9rem;
+    }
+    .about-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .about-links a {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--mid); text-decoration: none;
+      border-bottom: 1.5px solid var(--mid); padding-bottom: 2px;
+      transition: color 0.2s;
+    }
+    .about-links a:hover { color: var(--dark); border-color: var(--dark); }
+    @media (max-width: 680px) {
+      .about-layout { grid-template-columns: 1fr; gap: 2rem; }
     }
 
-    /* info panel */
-    .info-side {
-      background: #fff0f2;
-      position: relative;
+    /* ── SHARED PAGE LAYOUT ── */
+    .page-wrap {
+      width: min(900px, 92vw);
+      margin: 4.5rem auto 7rem;
+    }
+    .page-header { margin-bottom: 3rem; }
+    .section-eyebrow {
+      font-size: 0.68rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--mid);
+      margin-bottom: 0.5rem;
+    }
+    .page-header h2 {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 700;
+      font-style: italic;
+      color: var(--dark);
+      line-height: 1.05;
+    }
+
+    /* ── CV ── */
+    .cv-header {
+      padding-bottom: 2.5rem;
+      margin-bottom: 2.8rem;
+      border-bottom: 1.5px solid rgba(160,80,96,0.20);
+    }
+    .cv-header h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      font-weight: 700;
+      line-height: 1.05;
+      color: var(--dark);
+    }
+    .cv-header h1 em { font-style: italic; font-weight: 600; }
+    .cv-subtitle {
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--mid);
+      margin-top: 0.5rem;
+    }
+    .cv-contact {
+      margin-top: 0.6rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      color: var(--mid);
+    }
+    .cv-section {
+      margin-bottom: 2.8rem;
+      padding-bottom: 2.8rem;
+      border-bottom: 1px solid rgba(160,80,96,0.14);
+    }
+    .cv-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .cv-section > h3 {
+      font-size: 0.68rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--mid);
+      margin-bottom: 1.6rem;
+    }
+    .cv-entry {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 0.4rem 2rem;
+      margin-bottom: 1.6rem;
+    }
+    .cv-entry:last-child { margin-bottom: 0; }
+    .cv-year {
+      font-size: 0.78rem;
+      font-style: italic;
+      color: var(--mid);
+      padding-top: 0.12rem;
+      line-height: 1.5;
+    }
+    .cv-title {
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.4;
+    }
+    .cv-org {
+      font-size: 0.84rem;
+      font-style: italic;
+      color: var(--mid);
+      margin-top: 0.18rem;
+    }
+    .cv-org a {
+      color: var(--mid);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: color 0.2s;
+    }
+    .cv-org a:hover { color: var(--dark); }
+    .cv-note {
+      font-size: 0.80rem;
+      color: var(--mid);
+      margin-top: 0.3rem;
+      line-height: 1.65;
+    }
+    .cv-placeholder {
+      background: rgba(160,80,96,0.07);
+      border-radius: 10px;
+      padding: 1.5rem 1.8rem;
+      color: var(--mid);
+      font-style: italic;
+      font-size: 0.88rem;
+    }
+    .cv-skills-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 0.4rem 2rem;
+      margin-bottom: 0.9rem;
+    }
+    .cv-skills-row:last-child { margin-bottom: 0; }
+    .cv-skill-label {
+      font-size: 0.78rem;
+      font-style: italic;
+      color: var(--mid);
+      padding-top: 0.1rem;
+    }
+    .cv-skill-list {
+      font-size: 0.84rem;
+      color: var(--dark);
+      line-height: 1.7;
+    }
+
+    /* ── CERAMICS GALLERY ── */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.4rem;
+    }
+    .gallery-card {
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--panel);
+      box-shadow: 0 4px 18px rgba(92,36,56,0.10);
+      transition: transform 0.22s, box-shadow 0.22s;
+    }
+    .gallery-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(92,36,56,0.16);
+    }
+    .card-photo {
+      aspect-ratio: 1;
+      overflow: hidden;
+    }
+    .card-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.30s;
+    }
+    .gallery-card:hover .card-photo img { transform: scale(1.04); }
+    .card-photo.placeholder {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 3rem 2.5rem;
-      text-align: center;
-      gap: 1.2rem;
-      border-radius: 0 28px 28px 0;
-    }
-
-    .eyebrow {
-      font-size: 0.7rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
+      gap: 0.5rem;
       color: var(--mid);
-      font-weight: 600;
+      font-size: 0.75rem;
+      font-style: italic;
+      background: rgba(160,80,96,0.06);
+    }
+    .card-photo.placeholder .icon { font-size: 2rem; }
+    .card-caption { padding: 0.9rem 1.1rem 1rem; }
+    .card-caption h3 {
+      font-size: 0.90rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.2rem;
+    }
+    .card-caption p {
+      font-size: 0.76rem;
+      font-style: italic;
+      color: var(--mid);
     }
 
-    h1 {
-      font-size: clamp(2rem, 4vw, 3rem);
+
+    /* ── SHOP ── */
+    .shop-simple {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      text-align: center;
+    }
+    .shop-hero {
+      width: min(480px, 100%);
+      border-radius: 16px;
+      box-shadow: 0 8px 28px rgba(92,36,56,0.12);
+    }
+    .shop-closed-text {
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .shop-closed-title {
+      font-size: 1.1rem;
       font-weight: 700;
+      font-style: italic;
+      color: var(--dark);
+    }
+    .shop-closed-body {
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--mid);
+      line-height: 1.8;
+    }
+    .shop-closed-text .shop-follow {
+      margin: 0 auto;
+    }
+    .shop-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .shop-image-wrap {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(92,36,56,0.14);
+    }
+    .shop-image-wrap img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    .sold-out-badge {
+      position: absolute;
+      top: 18px; left: 18px;
+      background: var(--dark);
+      color: #fff0f2;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+    }
+    .shop-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+      padding-top: 0.5rem;
+    }
+    .shop-info h3 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700;
+      font-style: italic;
       color: var(--dark);
       line-height: 1.1;
     }
-    h1 em {
+    .shop-info .shop-desc {
+      font-size: 0.92rem;
       font-style: italic;
-      font-weight: 600;
-    }
-
-    .tagline {
-      font-size: 0.9rem;
-      font-style: italic;
-      font-weight: 600;
       color: var(--mid);
-      letter-spacing: 0.02em;
+      line-height: 1.8;
     }
-
-    .preorder-btn {
-      display: inline-block;
-      background: var(--dark);
-      color: #fff0f2;
-      text-decoration: none;
-      padding: 1rem 2.4rem;
-      border-radius: 50px;
-      font-family: 'Lora', serif;
-      font-size: 1rem;
+    .shop-coming {
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 1.3rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .shop-coming p {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--mid);
+      line-height: 1.75;
+    }
+    .shop-coming .shop-coming-title {
+      font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: 0.02em;
-      box-shadow: 0 4px 18px rgba(92, 36, 56, 0.28);
-      transition: transform 0.2s, box-shadow 0.2s;
-      margin-top: 0.4rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dark);
+      font-style: normal;
+      margin-bottom: 0.2rem;
     }
-    .preorder-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(92, 36, 56, 0.38);
+    .shop-follow {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--mid);
+      text-decoration: none;
+      transition: color 0.2s;
+      width: fit-content;
     }
-    .preorder-btn:active {
-      transform: translateY(0) scale(0.97);
+    .shop-follow svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .shop-follow:hover { color: var(--dark); }
+    @media (max-width: 680px) {
+      .shop-layout { grid-template-columns: 1fr; gap: 2rem; }
     }
-
-    .closed-msg {
+    .closed-card {
+      background: var(--panel);
+      border-radius: 24px;
+      padding: 3.5rem 2.5rem;
+      text-align: center;
+      max-width: 480px;
+      margin: 0 auto;
+      box-shadow: 0 8px 32px rgba(92,36,56,0.10);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    .closed-icon { font-size: 2.8rem; }
+    .closed-title {
+      font-size: 1.5rem;
+      font-style: italic;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .closed-body {
       font-size: 0.88rem;
       font-style: italic;
       color: var(--mid);
-      line-height: 1.7;
-      max-width: 240px;
-      margin-top: 0.2rem;
+      line-height: 1.75;
+      max-width: 340px;
     }
-    .closed-msg a {
-      color: var(--dark);
+    .closed-links {
+      display: flex;
+      gap: 1.4rem;
+      margin-top: 0.4rem;
+    }
+    .closed-links a {
+      font-size: 0.75rem;
       font-weight: 700;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-    .closed-msg a:hover {
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
       color: var(--mid);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .closed-links a:hover { color: var(--dark); }
+
+    /* ── CONTACT ── */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.4rem;
+    }
+    .contact-card {
+      background: var(--panel);
+      border-radius: 20px;
+      padding: 2.2rem 1.5rem;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.7rem;
+      box-shadow: 0 4px 18px rgba(92,36,56,0.09);
+      transition: transform 0.22s, box-shadow 0.22s;
+    }
+    .contact-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(92,36,56,0.15);
+    }
+    .contact-icon { color: var(--mid); }
+    .contact-icon svg { width: 28px; height: 28px; display: block; }
+    .contact-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--mid);
+    }
+    .contact-value {
+      font-size: 0.88rem;
+      font-style: italic;
+      color: var(--dark);
+      font-weight: 600;
+      text-align: center;
     }
 
-    .social-links {
-      display: flex;
-      gap: 1rem;
-      position: absolute;
-      bottom: 2rem;
-    }
-    .social-links a {
-      color: var(--mid);
-      transition: color 0.2s, transform 0.2s;
-      display: flex;
-    }
-    .social-links a:hover {
-      color: var(--dark);
-      transform: translateY(-2px);
-    }
-    .social-links svg {
-      width: 22px;
-      height: 22px;
+    /* ── MOBILE ── */
+    @media (max-width: 680px) {
+      nav { padding: 1rem 1.2rem; }
+      .nav-tabs { gap: 1.2rem; }
+      .hero-overlay { padding: 2rem 1.6rem; }
+      .wheel-frame { height: calc(100vh - 48px); }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .photo-grid   { grid-template-columns: repeat(2, 1fr); }
+      .cv-entry, .cv-skills-row { grid-template-columns: 1fr; gap: 0.1rem; }
+      .cv-year, .cv-skill-label { padding-top: 0; font-size: 0.72rem; }
+      .contact-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <div class="hero">
-    <div class="photo-side">
-      <img src="images/pool plates.jpeg" alt="mintyrachel ceramic pool plates" />
+  <!-- ── NAVIGATION ── -->
+  <nav>
+    <a href="#home" class="brand" data-tab="home">miNtY rAchEl</a>
+    <div class="nav-tabs">
+      <a href="#home"        class="nav-link active" data-tab="home">Home</a>
+      <a href="#ceramics"    class="nav-link"        data-tab="ceramics">Ceramics</a>
+      <a href="#shop"        class="nav-link"        data-tab="shop">Shop</a>
+      <a href="#about"       class="nav-link"        data-tab="about">About</a>
+      <a href="#cv"          class="nav-link"        data-tab="cv">CV</a>
     </div>
-    <div class="info-side">
-      <p class="eyebrow">preorders closed</p>
-      <h1>minty<em>rachel</em></h1>
-      <p class="tagline">small-batch, handmade ceramics</p>
-      <p class="closed-msg">this batch is sold out — follow along on <a href="https://instagram.com/mintyrachel" target="_blank">instagram</a> or <a href="https://patreon.com/mintyrachel?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink" target="_blank">patreon</a> to be the first to know about the next one ♡</p>
-      <p class="closed-msg">a shop is coming soon — stay tuned!</p>
+  </nav>
 
-      <div class="social-links">
-        <!-- Instagram -->
-        <a href="https://instagram.com/mintyrachel" target="_blank" aria-label="Instagram">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-            <circle cx="12" cy="12" r="4"/>
-            <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+  <!-- ══════════════════════ HOME ══════════════════════ -->
+  <section id="tab-home" class="tab-panel">
+
+    <div class="monitor-scene">
+      <div class="monitor-frame">
+        <iframe class="monitor-iframe" src="pottery_wheel/index.html?preview=1" title="Pottery Wheel" scrolling="no"></iframe>
+        <div class="screen-fx"></div>
+        <div class="play-screen" id="play-screen">
+          <svg class="play-btn" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="44" fill="rgba(0,0,0,0.12)" stroke="rgba(0,0,0,0.75)" stroke-width="2.5"/>
+            <polygon points="38,28 76,50 38,72" fill="rgba(0,0,0,0.85)"/>
           </svg>
-        </a>
-        <!-- Patreon -->
-        <a href="https://patreon.com/mintyrachel?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink" target="_blank" aria-label="Patreon">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="14.5" cy="9.5" r="6.5"/>
-            <rect x="3" y="2" width="3.5" height="20" rx="1"/>
+        </div>
+        <svg class="monitor-svg" viewBox="0 0 1999 1020" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <mask id="screen-mask">
+              <rect width="1999" height="1020" fill="white"/>
+              <rect x="495" y="262" width="563" height="423" fill="black" rx="4" ry="4"/>
+            </mask>
+          </defs>
+          <image href="images/tvstock1.png" width="1999" height="1020" mask="url(#screen-mask)"/>
+        </svg>
+      </div>
+
+      <div class="wheel-fullscreen" id="wheel-fullscreen">
+        <iframe id="wheel-fullscreen-iframe" title="Pottery Wheel Full" scrolling="no"></iframe>
+        <button class="close-wheel" id="close-wheel" title="Minimize">
+          <svg width="14" height="3" viewBox="0 0 14 3" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0.5" width="14" height="2" rx="1" fill="white"/>
           </svg>
-        </a>
+        </button>
       </div>
     </div>
-  </div>
+
+    <div class="home-footer">
+      <a href="https://instagram.com/mintyrachel" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>@mintyrachel</span>
+      </a>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════ CV ══════════════════════ -->
+  <section id="tab-cv" class="tab-panel hidden">
+    <div class="page-wrap">
+
+      <header class="cv-header">
+        <h1>Rachel <em>Min</em></h1>
+        <p class="cv-subtitle">Ceramic Artist, Coder, &amp; Educator</p>
+        <p class="cv-contact">New York, NY &nbsp;·&nbsp; @mintyrachel</p>
+      </header>
+
+      <div class="cv-section">
+        <h3>Residencies &amp; Workshops</h3>
+        <div class="cv-entry">
+          <span class="cv-year">2026</span>
+          <div>
+            <p class="cv-title">Artist Residency</p>
+            <p class="cv-org">Watershed Center for the Ceramic Arts — Newcastle, ME</p>
+          </div>
+        </div>
+        <div class="cv-entry">
+          <span class="cv-year">2026</span>
+          <div>
+            <p class="cv-title">Summer Workshop</p>
+            <p class="cv-org">Haystack Mountain School of Craft — Deer Isle, ME</p>
+            <p class="cv-note">Attended summer program in experimental glazing and 3D-printed clay</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-section">
+        <h3>Teaching Experience</h3>
+        <div class="cv-entry">
+          <span class="cv-year">2026–Present</span>
+          <div>
+            <p class="cv-title">Handbuilding Teacher</p>
+            <p class="cv-org">Mud Matters — New York, NY</p>
+          </div>
+        </div>
+        <div class="cv-entry">
+          <span class="cv-year">2026</span>
+          <div>
+            <p class="cv-title">Workshop Teacher</p>
+            <p class="cv-org">NFC + clay Workshop, Bolo Bolo Cafe — New York, NY</p>
+          </div>
+        </div>
+        <div class="cv-entry">
+          <span class="cv-year">2024</span>
+          <div>
+            <p class="cv-title">Handbuilding Teaching Assistant</p>
+            <p class="cv-org">@jhuangstudio (Johnathan Huang), DoClay — New York, NY</p>
+          </div>
+        </div>
+        <div class="cv-entry">
+          <span class="cv-year">2020</span>
+          <div>
+            <p class="cv-title">Adjunct Professor, Data Structures</p>
+            <p class="cv-org">Georgia State University — Atlanta, GA</p>
+            <p class="cv-note">Meta Engineer in Residence Program · Outstanding Teaching Award</p>
+          </div>
+        </div>
+        <div class="cv-entry">
+          <span class="cv-year">2018</span>
+          <div>
+            <p class="cv-title">Teacher</p>
+            <p class="cv-org">Girls Who Code — Seattle, WA</p>
+          </div>
+        </div>
+        <div class="cv-entry">
+          <span class="cv-year">2018</span>
+          <div>
+            <p class="cv-title">Teaching Assistant, 15-251: Great Ideas in Theoretical Computer Science</p>
+            <p class="cv-org">Carnegie Mellon University — Pittsburgh, PA</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-section">
+        <h3>Studio &amp; Related Experience</h3>
+        <div class="cv-entry">
+          <span class="cv-year">2025–Present</span>
+          <div>
+            <p class="cv-title">Full-Time Ceramicist</p>
+            <p class="cv-org">Independent Studio Practice — New York, NY</p>
+            <p class="cv-note">Functional and sculptural work for local craft fairs and markets</p>
+          </div>
+        </div>
+        <div class="cv-entry">
+          <span class="cv-year">2026–Present</span>
+          <div>
+            <p class="cv-title">Woodshop Assistant</p>
+            <p class="cv-org">Recess Grove — New York, NY</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-section">
+        <h3>Technical Professional Experience</h3>
+        <div class="cv-entry">
+          <span class="cv-year">2021–2024</span>
+          <div>
+            <p class="cv-title">Senior Software Engineer and Tech Lead, Design Systems</p>
+            <p class="cv-org">Figma — New York, NY</p>
+          </div>
+        </div>
+        <div class="cv-entry">
+          <span class="cv-year">2018–2021</span>
+          <div>
+            <p class="cv-title">Software Engineer, Fundraising on Instagram</p>
+            <p class="cv-org">Facebook (Meta) — New York, NY</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-section">
+        <h3>Publications &amp; Press</h3>
+        <div class="cv-entry">
+          <span class="cv-year">2020–2021</span>
+          <div>
+            <p class="cv-title">Fundraising on Instagram Announcement</p>
+            <p class="cv-org">
+              <a href="https://www.cnet.com/culture/meta-expands-fundraising-efforts-on-facebook-instagram-for-giving-tuesday/" target="_blank" rel="noopener">Cnet</a>,
+              <a href="https://www.engadget.com/instagram-group-fundraisers-192219600.html" target="_blank" rel="noopener">Engadget</a>,
+              <a href="https://www.facebook.com/business/news/coming-together-to-raise-5-billion-on-facebook-and-instagram-" target="_blank" rel="noopener">Facebook</a>
+            </p>
+          </div>
+        </div>
+        <div class="cv-entry">
+          <span class="cv-year">2024</span>
+          <div>
+            <p class="cv-title">Figma UI Kits</p>
+            <p class="cv-org"><a href="https://www.figma.com/blog/config-2024-recap/" target="_blank" rel="noopener">Config Headliner</a></p>
+          </div>
+        </div>
+        <div class="cv-entry">
+          <span class="cv-year">2024</span>
+          <div>
+            <p class="cv-title">Figma Library Analytics</p>
+            <p class="cv-org"><a href="https://www.figma.com/blog/what-we-launched-at-framework-2024/" target="_blank" rel="noopener">Framework</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-section">
+        <h3>Education</h3>
+        <div class="cv-entry">
+          <span class="cv-year">2018</span>
+          <div>
+            <p class="cv-title">B.S. Computer Science &nbsp;·&nbsp; B.A. Chemistry &nbsp;·&nbsp; Minor in Art</p>
+            <p class="cv-org">Carnegie Mellon University — Pittsburgh, PA</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-section">
+        <h3>Skills</h3>
+        <div class="cv-skills-row">
+          <span class="cv-skill-label">Media</span>
+          <p class="cv-skill-list">Ceramics · Oil Painting · Film &amp; Digital Photography · Printmaking · Watercolor · Drawing</p>
+        </div>
+        <div class="cv-skills-row">
+          <span class="cv-skill-label">Digital</span>
+          <p class="cv-skill-list">Lightroom · Photoshop · Figma · Microsoft Office · G-Suite</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════ CERAMICS ══════════════════════ -->
+  <section id="tab-ceramics" class="tab-panel hidden">
+    <div class="page-wrap">
+
+      <div class="gallery-grid">
+
+        <div class="gallery-card">
+          <div class="card-photo placeholder"><span class="icon">🫙</span><span>add photo</span></div>
+          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="card-photo placeholder"><span class="icon">🫙</span><span>add photo</span></div>
+          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="card-photo placeholder"><span class="icon">🍵</span><span>add photo</span></div>
+          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="card-photo placeholder"><span class="icon">🍽️</span><span>add photo</span></div>
+          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="card-photo placeholder"><span class="icon">🌸</span><span>add photo</span></div>
+          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="card-photo placeholder"><span class="icon">🌿</span><span>add photo</span></div>
+          <div class="card-caption"><h3>piece name</h3><p>description</p></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════ SHOP ══════════════════════ -->
+  <section id="tab-shop" class="tab-panel hidden">
+    <div class="page-wrap">
+      <div class="shop-simple">
+        <img class="shop-hero" src="images/nooks-cranny.png" alt="Nook's Cranny — shop currently closed"/>
+        <div class="shop-closed-text">
+          <p class="shop-closed-title">Shop Is Currently Sold Out !!</p>
+          <p class="shop-closed-body">The next batch is in the works. Follow along on Instagram to be the first to know when preorders open. Pieces sell out quickly.</p>
+          <a class="shop-follow" href="https://instagram.com/mintyrachel" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+            </svg>
+            @mintyrachel
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════ ABOUT ══════════════════════ -->
+  <section id="tab-about" class="tab-panel hidden">
+    <div class="page-wrap">
+      <div class="about-layout">
+        <div class="about-photo">
+          <span class="icon">🌿</span>
+          <span>add a photo</span>
+        </div>
+        <div class="about-text">
+          <div class="about-bio">
+            <p>I'm a ceramic artist and educator based in New York, making functional and sculptural work that lives somewhere between everyday ritual and quiet beauty.</p>
+            <p>Before clay, I was a software engineer at Figma and Meta — I still think in systems, but now they're made of porcelain. I studied CS and Chemistry at Carnegie Mellon, which means I can talk about both glaze chemistry and design tooling at the same dinner party.</p>
+            <p>I teach wheel-throwing and hand-building workshops, and I sell small batches of work at local craft fairs and through Instagram. Each piece is one of a kind.</p>
+          </div>
+          <div class="about-tags">
+            <span class="about-tag">wheel throwing</span>
+            <span class="about-tag">hand building</span>
+            <span class="about-tag">functional ceramics</span>
+            <span class="about-tag">teaching</span>
+            <span class="about-tag">new york</span>
+          </div>
+          <div class="about-links">
+            <a href="https://instagram.com/mintyrachel" target="_blank" rel="noopener">@mintyrachel</a>
+            <a href="mailto:rachelhmin@gmail.com">rachelhmin@gmail.com</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <script>
+    const panels = document.querySelectorAll('.tab-panel');
+    const links  = document.querySelectorAll('[data-tab]');
+
+    function switchTab(name) {
+      panels.forEach(p => p.classList.add('hidden'));
+      links.forEach(l => l.classList.remove('active'));
+      const panel = document.getElementById('tab-' + name);
+      if (panel) panel.classList.remove('hidden');
+      links.forEach(l => { if (l.dataset.tab === name) l.classList.add('active'); });
+    }
+
+    links.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const tab = link.dataset.tab;
+        switchTab(tab);
+        history.pushState(null, '', '#' + tab);
+      });
+    });
+
+    // Restore tab from URL hash on load
+    const hash = location.hash.slice(1);
+    if (hash && document.getElementById('tab-' + hash)) {
+      switchTab(hash);
+    }
+
+    // Play button → fullscreen pottery wheel
+    (function() {
+      const playScreen   = document.getElementById('play-screen');
+      const overlay      = document.getElementById('wheel-fullscreen');
+      const overlayIframe = document.getElementById('wheel-fullscreen-iframe');
+      const monitorFrame = document.querySelector('.monitor-frame');
+      const closeBtn     = document.getElementById('close-wheel');
+
+      playScreen.addEventListener('click', () => {
+        const sceneRect = overlay.parentElement.getBoundingClientRect();
+        const rect = playScreen.getBoundingClientRect();
+        const cx = rect.left + rect.width  / 2 - sceneRect.left;
+        const cy = rect.top  + rect.height / 2 - sceneRect.top;
+        overlay.style.transformOrigin = cx + 'px ' + cy + 'px';
+        if (!overlayIframe.src) overlayIframe.src = 'pottery_wheel/index.html';
+        monitorFrame.style.opacity = '0';
+        monitorFrame.style.pointerEvents = 'none';
+        overlay.classList.add('active');
+      });
+
+      closeBtn.addEventListener('click', () => {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+          monitorFrame.style.opacity = '';
+          monitorFrame.style.pointerEvents = '';
+        }, 300);
+      });
+    })();
+  </script>
 
 </body>
 </html>
