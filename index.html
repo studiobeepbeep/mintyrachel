@@ -375,6 +375,99 @@
     }
 
     /* ── CERAMICS GALLERY ── */
+    /* ── CERAMICS SOCIAL FEED ── */
+    .social-feed-wrap {
+      width: min(1050px, 96vw);
+      margin: 0 auto 3.5rem;
+    }
+    .social-tagline {
+      font-size: 0.7rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--mid);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .social-feed {
+      display: flex;
+      gap: 1.2rem;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .social-feed-item {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .social-feed-item .instagram-media {
+      max-width: 100% !important;
+      min-width: 0 !important;
+      width: 100% !important;
+      margin: 0 !important;
+    }
+    .tiktok-iframe {
+      width: 100%;
+      height: 750px;
+      border: none;
+      display: block;
+    }
+    .ig-comment {
+      margin-top: 10px;
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .ig-comment-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .ig-avatar {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      background: #f7a500;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 7px; font-weight: 900; color: #fff;
+      letter-spacing: 0.04em; font-family: sans-serif;
+      border: 2px solid #0055a4;
+      line-height: 1.1; text-align: center;
+      padding: 2px;
+    }
+    .ig-comment-body { display: flex; flex-direction: column; gap: 3px; }
+    .ig-comment-username {
+      font-size: 0.8rem; font-weight: 700; color: #fff;
+      font-family: sans-serif; font-style: normal;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .ig-verified {
+      width: 14px; height: 14px; flex-shrink: 0;
+    }
+    .ig-comment-text {
+      font-size: 0.85rem; color: #fff;
+      font-family: sans-serif; font-style: normal; font-weight: 400;
+    }
+    .ig-comment-meta {
+      font-size: 0.72rem; color: #888;
+      font-family: sans-serif; font-style: normal;
+      display: flex; gap: 12px;
+    }
+    .ig-view-replies {
+      padding-left: 50px;
+      font-size: 0.72rem; color: #888;
+      font-family: sans-serif; font-style: normal;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ig-view-replies::before {
+      content: ''; display: block;
+      width: 24px; height: 1px; background: #444;
+    }
+    @media (max-width: 680px) {
+      .social-feed { flex-direction: column; align-items: center; }
+      .social-feed-item { width: 100%; max-width: 400px; }
+    }
     .gallery-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -877,8 +970,8 @@
 
   <!-- ══════════════════════ CERAMICS ══════════════════════ -->
   <section id="tab-ceramics" class="tab-panel hidden">
-    <div class="page-wrap">
 
+    <div class="page-wrap">
       <div class="gallery-grid">
 
         <div class="gallery-card">
@@ -913,6 +1006,34 @@
 
       </div>
     </div>
+
+    <div class="social-feed-wrap">
+      <p class="social-tagline">As seen on social media (5M+ views)</p>
+      <div class="social-feed">
+
+        <div class="social-feed-item">
+          <iframe class="tiktok-iframe"
+            src="https://www.tiktok.com/embed/v2/7615311874355105038"
+            allowfullscreen allow="encrypted-media"></iframe>
+        </div>
+
+        <div class="social-feed-item">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/DZXyb0BzkmC/"
+            data-instgrm-version="14">
+          </blockquote>
+          <img src="images/knicks-comment.png" alt="nyknicks: i love him — 862 likes" style="width:100%;border-radius:12px;margin-top:10px;display:block;"/>
+        </div>
+
+        <div class="social-feed-item">
+          <iframe class="tiktok-iframe"
+            src="https://www.tiktok.com/embed/v2/7579724501114572046"
+            allowfullscreen allow="encrypted-media"></iframe>
+        </div>
+
+      </div>
+    </div>
+
   </section>
 
   <!-- ══════════════════════ SHOP ══════════════════════ -->
@@ -974,27 +1095,42 @@
     const panels = document.querySelectorAll('.tab-panel');
     const links  = document.querySelectorAll('[data-tab]');
 
+    // Handle GitHub Pages SPA redirect
+    (function() {
+      const redirect = sessionStorage.redirect;
+      delete sessionStorage.redirect;
+      if (redirect) history.replaceState(null, null, redirect);
+    })();
+
+    const playScreen = document.getElementById('play-screen');
+    let homeVisited = false;
+
     function switchTab(name) {
       panels.forEach(p => p.classList.add('hidden'));
       links.forEach(l => l.classList.remove('active'));
       const panel = document.getElementById('tab-' + name);
       if (panel) panel.classList.remove('hidden');
       links.forEach(l => { if (l.dataset.tab === name) l.classList.add('active'); });
+      if (name === 'home' && homeVisited) {
+        playScreen.style.animation = 'none';
+        playScreen.style.opacity = '1';
+      }
     }
 
     links.forEach(link => {
       link.addEventListener('click', e => {
         e.preventDefault();
         const tab = link.dataset.tab;
+        if (tab !== 'home') homeVisited = true;
         switchTab(tab);
-        history.pushState(null, '', '#' + tab);
+        history.pushState(null, '', tab === 'home' ? '/' : '/' + tab);
       });
     });
 
-    // Restore tab from URL hash on load
-    const hash = location.hash.slice(1);
-    if (hash && document.getElementById('tab-' + hash)) {
-      switchTab(hash);
+    // Restore tab from URL path on load
+    const path = location.pathname.replace(/^\//, '').replace(/\/$/, '') || 'home';
+    if (path !== 'home' && document.getElementById('tab-' + path)) {
+      switchTab(path);
     }
 
     // Play button → fullscreen pottery wheel
@@ -1026,6 +1162,8 @@
       });
     })();
   </script>
+
+  <script async src="https://www.instagram.com/embed.js"></script>
 
 </body>
 </html>
