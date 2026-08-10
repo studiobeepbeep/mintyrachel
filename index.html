@@ -234,14 +234,15 @@
       background: var(--bg); color: var(--dark);
       border-radius: 20px; padding: 0.35rem 0.9rem;
     }
-    .about-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .about-links { display: flex; gap: 1.2rem; flex-wrap: wrap; }
     .about-links a {
+      display: flex; align-items: center; gap: 0.45rem;
       font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
       color: var(--mid); text-decoration: none;
-      border-bottom: 1.5px solid var(--mid); padding-bottom: 2px;
       transition: color 0.2s;
     }
-    .about-links a:hover { color: var(--dark); border-color: var(--dark); }
+    .about-links a svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .about-links a:hover { color: var(--dark); }
     @media (max-width: 680px) {
       .about-layout { grid-template-columns: 1fr; gap: 2rem; }
     }
@@ -940,25 +941,28 @@
     <div class="page-wrap">
       <div class="about-layout">
         <div class="about-photo">
-          <span class="icon">🌿</span>
-          <span>add a photo</span>
+          <img src="images/rachel.jpg" alt="Rachel Min" style="width:100%;height:100%;object-fit:cover;border-radius:20px;"/>
         </div>
         <div class="about-text">
           <div class="about-bio">
-            <p>I'm a ceramic artist and educator based in New York, making functional and sculptural work that lives somewhere between everyday ritual and quiet beauty.</p>
-            <p>Before clay, I was a software engineer at Figma and Meta — I still think in systems, but now they're made of porcelain. I studied CS and Chemistry at Carnegie Mellon, which means I can talk about both glaze chemistry and design tooling at the same dinner party.</p>
-            <p>I teach wheel-throwing and hand-building workshops, and I sell small batches of work at local craft fairs and through Instagram. Each piece is one of a kind.</p>
-          </div>
-          <div class="about-tags">
-            <span class="about-tag">wheel throwing</span>
-            <span class="about-tag">hand building</span>
-            <span class="about-tag">functional ceramics</span>
-            <span class="about-tag">teaching</span>
-            <span class="about-tag">new york</span>
+            <p>I'm a ceramic artist, coder, and educator based in New York, making functional and sculptural work. Before clay, I was a software engineer at Figma and Meta. I've always found ways to teach, no matter what else I was doing. I studied Computer Science, Chemistry, and Art at Carnegie Mellon. I currently teach wheel-throwing and hand-building workshops, and I sell small batches of work at local craft fairs and through Instagram.</p>
+            <p>I'm currently thinking about how to embed hardware into clay.</p>
           </div>
           <div class="about-links">
-            <a href="https://instagram.com/mintyrachel" target="_blank" rel="noopener">@mintyrachel</a>
-            <a href="mailto:rachelhmin@gmail.com">rachelhmin@gmail.com</a>
+            <a href="https://instagram.com/mintyrachel" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+              </svg>
+              @mintyrachel
+            </a>
+            <a href="https://www.tiktok.com/@minty.rachel" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.21 8.21 0 004.79 1.52V6.75a4.85 4.85 0 01-1.03-.06z"/>
+              </svg>
+              @minty.rachel
+            </a>
           </div>
         </div>
       </div>
