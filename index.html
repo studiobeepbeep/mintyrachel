@@ -29,7 +29,7 @@
 
     body {
       font-family: 'Lora', serif;
-      background: var(--bg);
+      background: var(--panel);
       color: var(--dark);
       min-height: 100vh;
     }
@@ -42,12 +42,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1.1rem 2.5rem;
+      padding: 0.6rem 2.5rem;
       background: var(--panel);
     }
     .brand {
       font-family: 'Dirtyline', serif;
-      font-size: 1.9rem;
+      font-size: 2.8rem;
       font-weight: normal;
       font-style: normal;
       color: var(--dark);
@@ -89,27 +89,6 @@
     .tab-panel.hidden { display: none; }
 
     /* ── HOME: POTTERY WHEEL ── */
-    .home-footer {
-      display: flex;
-      justify-content: center;
-      gap: 2.5rem;
-      padding: 1.6rem 2rem;
-      background: var(--panel);
-    }
-    .home-footer a {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
-      color: var(--mid);
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      transition: color 0.2s, transform 0.2s;
-    }
-    .home-footer a:hover { color: var(--dark); transform: translateY(-2px); }
-    .home-footer svg { width: 20px; height: 20px; }
     /* ── HOME: COMPUTER PHOTO FRAME ── */
     .monitor-scene {
       position: relative;
@@ -117,8 +96,9 @@
     }
     .monitor-frame {
       position: relative;
-      width: 100%;
-      aspect-ratio: 1999 / 1020;
+      width: min(100%, calc(2 * (100dvh - 4rem)));
+      margin-left: 0;
+      aspect-ratio: 2000 / 1000;
     }
     .monitor-svg {
       position: absolute;
@@ -130,20 +110,20 @@
     }
     .monitor-iframe {
       position: absolute;
-      top: 25.3%;
-      left: 24.5%;
-      width: 28.8%;
-      height: 42.1%;
+      top: 23.3%;
+      left: 23.05%;
+      width: 28.4%;
+      height: 42.2%;
       border: none;
       z-index: 1;
     }
     /* CRT scanlines + vignette over the screen */
     .screen-fx {
       position: absolute;
-      top: 25.3%;
-      left: 24.5%;
-      width: 28.8%;
-      height: 42.1%;
+      top: 23.3%;
+      left: 23.05%;
+      width: 28.4%;
+      height: 42.2%;
       pointer-events: none;
       z-index: 3;
     }
@@ -166,7 +146,7 @@
     .monitor-frame { transition: opacity 0.5s ease; }
     .play-screen {
       position: absolute;
-      top: 25.3%; left: 24.5%; width: 28.8%; height: 42.1%;
+      top: 23.3%; left: 23.05%; width: 28.4%; height: 42.2%;
       z-index: 6; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       animation: playscreenin 0.7s ease 4s both;
@@ -251,7 +231,7 @@
     /* ── SHARED PAGE LAYOUT ── */
     .page-wrap {
       width: min(900px, 92vw);
-      margin: 4.5rem auto 7rem;
+      margin: 2rem auto 7rem;
     }
     .page-header { margin-bottom: 3rem; }
     .section-eyebrow {
@@ -719,7 +699,9 @@
 
     /* ── MOBILE ── */
     @media (max-width: 680px) {
-      nav { padding: 1rem 1.2rem; }
+      nav { padding: 1rem 1.2rem; align-items: center; }
+      .brand { font-size: 2.0rem; display: flex; align-items: center; }
+      .nav-hamburger { align-self: center; padding: 0; }
       .nav-hamburger { display: flex; }
       .nav-tabs {
         display: none;
@@ -745,17 +727,9 @@
       .contact-grid { grid-template-columns: 1fr; }
       .page-wrap { margin-top: 1.5rem; }
 
-      /* pottery wheel: crop to just the monitor on mobile */
-      .monitor-scene {
-        height: 380px;
-        overflow: hidden;
-      }
-      .monitor-frame {
-        position: absolute;
-        width: 270%;
-        left: -52%;
-        top: -50px;
-      }
+      /* fill viewport below nav on mobile */
+      .monitor-scene { height: calc(100dvh - 64px); overflow: hidden; }
+      .monitor-frame { position: absolute; width: 270%; left: -50.6%; top: 20px; }
 
     }
   </style>
@@ -790,35 +764,18 @@
         <div class="screen-fx"></div>
         <div class="play-screen" id="play-screen">
           <svg class="play-btn" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="44" fill="rgba(0,0,0,0.12)" stroke="rgba(0,0,0,0.75)" stroke-width="2.5"/>
-            <polygon points="38,28 76,50 38,72" fill="rgba(0,0,0,0.85)"/>
+            <circle cx="50" cy="50" r="44" fill="rgba(0,0,0,0.12)" stroke="rgba(60,60,60,0.75)" stroke-width="2.5"/>
+            <polygon points="38,28 76,50 38,72" fill="rgba(60,60,60,0.85)"/>
           </svg>
         </div>
-        <svg class="monitor-svg" viewBox="0 0 1999 1020" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <mask id="screen-mask">
-              <rect width="1999" height="1020" fill="white"/>
-              <rect x="495" y="262" width="563" height="423" fill="black" rx="4" ry="4"/>
-            </mask>
-          </defs>
-          <image href="images/tvstock1.png" width="1999" height="1020" mask="url(#screen-mask)"/>
+        <svg class="monitor-svg" viewBox="0 0 2000 1000" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <image href="images/tvstock1.png" width="2000" height="1000"/>
         </svg>
       </div>
 
       <div class="wheel-fullscreen" id="wheel-fullscreen">
         <iframe id="wheel-fullscreen-iframe" title="Pottery Wheel Full" scrolling="no"></iframe>
       </div>
-    </div>
-
-    <div class="home-footer">
-      <a href="https://instagram.com/mintyrachel" target="_blank" rel="noopener" aria-label="Instagram">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-          <circle cx="12" cy="12" r="4"/>
-          <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
-        </svg>
-        <span>@mintyrachel</span>
-      </a>
     </div>
 
   </section>

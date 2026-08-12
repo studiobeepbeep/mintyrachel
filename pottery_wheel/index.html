@@ -2313,6 +2313,10 @@
       const grainZ = tableD - 0.02;
       if (sharePortrait) {
         const grainSpacing = 0.55;
+        // Center line so gap at x=0 matches all other gaps
+        const centerStrip = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.003, grainZ), grainMat);
+        centerStrip.position.set(0, -1.099, tableZCenter);
+        shareSceneGroup.add(centerStrip);
         for (let n = 1; n * grainSpacing < tableW / 2; n++) {
           [-1, 1].forEach(side => {
             const strip = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.003, grainZ), grainMat);
@@ -2458,8 +2462,8 @@
       });
 
       if (innerWidth < innerHeight) {
-        camera.position.set(0, 0.5, 4.2);
-        camera.lookAt(0, -1.1, 0);
+        camera.position.set(0, 0.2, 4.2);
+        camera.lookAt(0, -1.5, 0);
       } else {
         camera.position.set(0, 1.4, 5.8);
         camera.lookAt(0, -0.2, 0);
