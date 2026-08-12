@@ -2311,11 +2311,22 @@
       shareSceneGroup.add(tableTop);
 
       const grainZ = tableD - 0.02;
-      const grainSpacing = sharePortrait ? 0.55 : 0.9;
-      for (let gx = -tableW / 2 + grainSpacing; gx < tableW / 2; gx += grainSpacing) {
-        const strip = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.003, grainZ), grainMat);
-        strip.position.set(gx, -1.099, tableZCenter);
-        shareSceneGroup.add(strip);
+      if (sharePortrait) {
+        const grainSpacing = 0.55;
+        for (let n = 1; n * grainSpacing < tableW / 2; n++) {
+          [-1, 1].forEach(side => {
+            const strip = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.003, grainZ), grainMat);
+            strip.position.set(side * n * grainSpacing, -1.099, tableZCenter);
+            shareSceneGroup.add(strip);
+          });
+        }
+      } else {
+        // 4 lines dividing table into 5 equal sections — inner gap = half the line spacing
+        [-0.3, -0.1, 0.1, 0.3].forEach(f => {
+          const strip = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.003, grainZ), grainMat);
+          strip.position.set(f * tableW, -1.099, tableZCenter);
+          shareSceneGroup.add(strip);
+        });
       }
 
       if (!sharePortrait) {

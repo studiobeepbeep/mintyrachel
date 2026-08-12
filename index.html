@@ -1137,6 +1137,17 @@
       const panel = document.getElementById('tab-' + name);
       if (panel) panel.classList.remove('hidden');
       links.forEach(l => { if (l.dataset.tab === name) l.classList.add('active'); });
+
+      const overlay     = document.getElementById('wheel-fullscreen');
+      const closeBtn    = document.getElementById('close-wheel');
+      const monitorFrame = document.querySelector('.monitor-frame');
+      if (name !== 'home') {
+        overlay.classList.remove('active');
+        closeBtn.classList.remove('visible');
+        monitorFrame.style.opacity = '';
+        monitorFrame.style.pointerEvents = '';
+      }
+
       if (name === 'home' && homeVisited) {
         playScreen.style.animation = 'none';
         playScreen.style.opacity = '1';
