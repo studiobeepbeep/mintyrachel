@@ -93,6 +93,12 @@
 
     /* ── TAB PANELS ── */
     .tab-panel { display: block; }
+    .monitor-scene {
+      min-height: calc(100dvh - 4rem);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .tab-panel.hidden { display: none; }
 
     /* ── HOME: POTTERY WHEEL ── */
@@ -736,7 +742,7 @@
 
       /* fill viewport below nav on mobile */
       .monitor-scene { height: calc(100dvh - 64px); overflow: hidden; }
-      .monitor-frame { position: absolute; width: 270%; left: -50.6%; top: 20px; }
+      .monitor-frame { position: absolute; width: 270%; left: -50.6%; top: 50%; transform: translateY(-50%); }
 
     }
   </style>
@@ -1214,13 +1220,22 @@
         closeBtn.classList.add('visible');
       });
 
-      closeBtn.addEventListener('click', () => {
+      function closeOverlay() {
         overlay.classList.remove('active');
         closeBtn.classList.remove('visible');
         setTimeout(() => {
           monitorFrame.style.opacity = '';
           monitorFrame.style.pointerEvents = '';
         }, 300);
+      }
+
+      closeBtn.addEventListener('click', closeOverlay);
+
+      document.querySelector('.brand').addEventListener('click', (e) => {
+        if (overlay.classList.contains('active')) {
+          e.preventDefault();
+          closeOverlay();
+        }
       });
     })();
   </script>

@@ -129,6 +129,26 @@
     }
     .glaze-opt.active canvas { border-color: rgba(255,215,80,0.90); filter: brightness(1.15); }
     .glaze-opt:hover:not(.active) canvas { border-color: rgba(255,255,255,0.40); filter: brightness(1.12); }
+    @keyframes glazeShake {
+      0%, 100% { transform: rotate(0deg); }
+      20%  { transform: rotate(-4deg); }
+      50%  { transform: rotate(4deg); }
+      80%  { transform: rotate(-2deg); }
+    }
+    .glaze-opt.shake {
+      animation: glazeShake 0.65s ease-in-out;
+      transform-origin: bottom center;
+    }
+    #glaze-hint {
+      position: fixed; top: 48%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255,255,255,0.90);
+      font-family: Georgia, serif; font-size: 15px;
+      letter-spacing: 2px;
+      pointer-events: none; white-space: nowrap; z-index: 20;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 2px 12px rgba(0,0,0,0.85);
+      display: none;
+    }
     /* ── Skip animation button ── */
     #skip-btn {
       position: fixed; bottom: 72px; right: 50px;
@@ -295,6 +315,7 @@
   <div id="stage-label">Centering…</div>
   <div id="hint">Left/right shapes &nbsp;·&nbsp; Up/down moves hands &nbsp;·&nbsp; Drag the <em>top</em> up/down to change height</div>
   <div id="glaze-panel"></div>
+  <div id="glaze-hint">← pick a glaze</div>
   <button id="fire-btn2">Fire Kiln</button>
   <div id="masterpiece-label">Your Masterpiece</div>
   <button id="pick-flowers-btn">Pick Flowers</button>
@@ -1591,6 +1612,15 @@
         opt.classList.add('active');
         selectedGlaze = i;
         renderer.domElement.style.cursor = paintbrushCursor(g.brushColor);
+        stopGlazeShake();
+        // Auto-apply glaze to entire vase immediately
+        const tex = makeGlazeTexture(i);
+        clayMat.map = tex; clayMat.color.set(0xffffff);
+        clayMat.roughness = g.roughness; clayMat.metalness = g.metalness;
+        clayMat.needsUpdate = true;
+        capMat.map = tex; capMat.color.set(0xffffff);
+        capMat.roughness = g.roughness; capMat.metalness = g.metalness;
+        capMat.needsUpdate = true;
       });
       glazePanel.appendChild(opt);
     });
@@ -1626,12 +1656,42 @@
     }
     rebuildClay();
 
-    // ── touch indicator ring ───────────────────────────────────────────────────
-    const touchRingMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35 });
-    const touchRing = new THREE.Mesh(new THREE.TorusGeometry(1, 0.022, 8, 72), touchRingMat);
-    touchRing.rotation.x = Math.PI / 2;
-    touchRing.visible = false;
-    scene.add(touchRing);
+    let _shakeInterval = null;
+    let _shakeIdx = 0;
+
+    function startGlazeShakeCycle() {
+      if (_shakeInterval) return;
+      const opts = () => document.querySelectorAll('.glaze-opt');
+      _shakeIdx = 0;
+      function next() {
+        opts().forEach(el => el.classList.remove('shake'));
+        const all = opts();
+        if (!all.length) return;
+        const el = all[_shakeIdx % all.length];
+        el.classList.add('shake');
+        el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+        _shakeIdx++;
+      }
+      next();
+      _shakeInterval = setInterval(next, 800);
+    }
+
+    function showGlazePanel() {
+      document.getElementById('glaze-panel').style.display = 'flex';
+      document.getElementById('glaze-hint').style.display = 'block';
+      startGlazeShakeCycle();
+    }
+    function hideGlazePanel() {
+      document.getElementById('glaze-panel').style.display = 'none';
+      document.getElementById('glaze-hint').style.display = 'none';
+      stopGlazeShake();
+    }
+    function stopGlazeShake() {
+      clearInterval(_shakeInterval);
+      _shakeInterval = null;
+      document.querySelectorAll('.glaze-opt').forEach(el => el.classList.remove('shake'));
+      document.getElementById('glaze-hint').style.display = 'none';
+    }
 
     // ── interaction ────────────────────────────────────────────────────────────
     const raycaster = new THREE.Raycaster();
@@ -1910,7 +1970,7 @@
       masterReady = true;
       scene.background = makeBg();
       document.getElementById('fire-btn2').style.display = 'none';
-      document.getElementById('glaze-panel').style.display = 'none';
+      hideGlazePanel();
       document.getElementById('glaze-panel').querySelectorAll('.glaze-opt').forEach(el => el.classList.remove('active'));
       skipBtn.style.display = 'none';
       enterFlowerStage();
@@ -1973,7 +2033,7 @@
       clayGroup.position.set(0, -1.1, 0);
       glazingReady = true;
       tableGroup.visible = true;
-      document.getElementById('glaze-panel').style.display = 'flex';
+      showGlazePanel();
       document.getElementById('fire-btn2').style.display = 'block';
       scene.background = makeBg();
       skipBtn.style.display = 'none';
@@ -2116,7 +2176,7 @@
               clayGroup.position.set(0, -1.1, 0);
               glazingReady = true;
               tableGroup.visible = true;
-              document.getElementById('glaze-panel').style.display = 'flex';
+              showGlazePanel();
               document.getElementById('fire-btn2').style.display = 'block';
               scene.background = makeBg();
               skipBtn.style.display = 'none';
@@ -2136,7 +2196,7 @@
       if (!glazingReady || fired2) return;
       fired2 = true;
       document.getElementById('fire-btn2').style.display = 'none';
-      document.getElementById('glaze-panel').style.display = 'none';
+      hideGlazePanel();
       skipBtn.style.display = 'block';
       renderer.domElement.style.cursor = 'default';
 
@@ -2639,13 +2699,6 @@
 
       if (dragging) {
         const bi = Math.min(Math.round((activeH / clayH) * (N - 1)), N - 1);
-        touchRing.scale.setScalar(radii[bi]);
-        touchRing.position.y = resizingHeight ? clayH : activeH;
-        // Green ring = height mode, white ring = shaping mode
-        touchRingMat.color.setHex(resizingHeight ? 0x88ffaa : 0xffffff);
-        touchRing.visible = true;
-      } else {
-        touchRing.visible = false;
       }
 
 
