@@ -2671,7 +2671,7 @@
         const entry = allCupMeshes.find(c => c.mesh === hits[0].object);
         if (entry) {
           const cup = cupData[entry.cupIdx];
-          if (cup && cup.state === 'idle') { cup.state = 'drinking'; cup.t = 0; }
+          if (cup && cup.state === 'idle') { cup.state = 'drinking'; cup.t = 0; pwEvent('pw_cup_clicked'); }
         }
       }
     });
