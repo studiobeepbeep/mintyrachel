@@ -1117,6 +1117,7 @@
       if (panel) panel.classList.remove('hidden');
       links.forEach(l => { if (l.dataset.tab === name) l.classList.add('active'); });
       document.body.style.overflow = name === 'home' ? 'hidden' : '';
+      window.scrollTo(0, 0);
 
       const overlay     = document.getElementById('wheel-fullscreen');
       const closeBtn    = document.getElementById('close-wheel');
