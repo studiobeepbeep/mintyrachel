@@ -3,6 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>Pottery Wheel</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9T1BBZ6Q2H"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9T1BBZ6Q2H');
+    function pwEvent(name, params) {
+      if (typeof gtag === 'function') gtag('event', name, params || {});
+    }
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { overflow: hidden; background: #a8d8ea; }
@@ -334,6 +345,7 @@
     document.body.classList.add('preview-mode');
   }
   (() => {
+    pwEvent('pw_game_opened');
 
     // ── impressionist sunflower background ────────────────────────────────────
     function makeSunflowerBg(W = 1200, H = 800) {
@@ -1224,7 +1236,7 @@
     }
 
     function addFlowerToVase(type) {
-      if (flowersInVase === 0) dismissFlowerHint();
+      if (flowersInVase === 0) { dismissFlowerHint(); pwEvent('pw_flowers_added'); }
       if (flowersInVase >= MAX_FLOWERS) return;
       const vaseTopY = clayGroup.position.y + clayH;
       const slot = flowersInVase;
@@ -1677,6 +1689,7 @@
     }
 
     function showGlazePanel() {
+      pwEvent('pw_glaze_panel_opened');
       document.getElementById('glaze-panel').style.display = 'flex';
       document.getElementById('glaze-hint').style.display = 'block';
       startGlazeShakeCycle();
@@ -1712,6 +1725,7 @@
 
     let shapeHintShown = false;
     let hasInteracted = false;
+    let hasSentRotatedEvent = false;
     function dismissShapeHint() {
       if (!shapeHintShown) return;
       shapeHintShown = false;
@@ -1725,6 +1739,7 @@
 
       // ── orbit drag (flower stage only) ───────────────────────────────────────
       if (masterReady && flowerStage) {
+        if (!hasSentRotatedEvent) { pwEvent('pw_pot_rotated'); hasSentRotatedEvent = true; }
         orbitActive = true;
         orbitDragX  = e.clientX;
         orbitDragY  = e.clientY;
@@ -1759,6 +1774,7 @@
       }
 
       // ── throwing interaction (pre-fire) ──────────────────────────────────────
+      if (!hasInteracted) pwEvent('pw_clay_shaped');
       hasInteracted = true;
       dismissShapeHint();
       const hits = raycaster.intersectObject(clayMesh);
@@ -2087,6 +2103,7 @@
       document.getElementById('fire-btn').textContent = 'Fire Kiln';
       fired = false;
       hasInteracted = false;
+      hasSentRotatedEvent = false;
     });
 
     function spawnFireEmojis() {
@@ -2130,6 +2147,7 @@
     document.getElementById('fire-btn').addEventListener('click', () => {
       if (animating || fired) return;
       fired = true;
+      pwEvent('pw_fired_first');
       document.getElementById('fire-btn').style.display = 'none';
       document.getElementById('hint').style.display = 'none';
       shapeHintShown = false;
@@ -2195,6 +2213,7 @@
     document.getElementById('fire-btn2').addEventListener('click', () => {
       if (!glazingReady || fired2) return;
       fired2 = true;
+      pwEvent('pw_glaze_fired', { glaze_name: selectedGlaze !== null ? glazeDefs[selectedGlaze].label : 'none' });
       document.getElementById('fire-btn2').style.display = 'none';
       hideGlazePanel();
       skipBtn.style.display = 'block';
@@ -2483,6 +2502,7 @@
     function enterShareStage() {
       if (shareStage) return;
       shareStage = true;
+      pwEvent('pw_share_scene_reached');
 
       buildShareScene();
 
@@ -2597,6 +2617,7 @@
     }
 
     document.getElementById('share-photo-btn').addEventListener('click', () => {
+      pwEvent('pw_downloaded');
       const a = document.createElement('a');
       a.href = captureScene();
       a.download = 'my-pottery-vase.jpg';
@@ -2604,6 +2625,7 @@
     });
 
     document.getElementById('make-new-btn').addEventListener('click', () => {
+      pwEvent('pw_new_pot');
       document.getElementById('reset').click();
     });
 
