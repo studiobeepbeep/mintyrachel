@@ -316,6 +316,7 @@
     body.preview-mode #share-btn,
     body.preview-mode #share-controls,
     body.preview-mode #glaze-panel { display: none !important; }
+
   </style>
 </head>
 <body>
@@ -773,6 +774,17 @@
       const portrait = innerWidth < innerHeight;
       return new THREE.CanvasTexture(makeSunflowerBg(portrait ? 800 : 1200, portrait ? 1200 : 800));
     }
+    function showEl(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = (id === 'share-controls' || id === 'glaze-panel') ? 'flex' : 'block';
+    }
+    function hideEl(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = 'none';
+    }
+
     const scene = new THREE.Scene();
     scene.background = makeBg();
 
@@ -891,9 +903,9 @@
       topCapOpacity = 0;
       clayGroup.position.set(0, -1.1, 0);
       animating = false;
-      document.getElementById('reset').style.display = 'block';
+      showEl('reset');
       stageLabel.style.display = 'none';
-      document.getElementById('fire-btn').style.display = 'block';
+      showEl('fire-btn');
     }
 
     radii = [...KF_LUMP];   // start in lump state
@@ -1210,10 +1222,7 @@
     }
 
     function dismissFlowerHint() {
-      const el = document.getElementById('flower-hint');
-      el.style.transition = 'opacity 0.5s';
-      el.style.opacity = '0';
-      setTimeout(() => { el.style.display = 'none'; }, 500);
+      hideEl('flower-hint');
     }
 
     function addFlowerToVase(type) {
@@ -1671,20 +1680,20 @@
 
     function showGlazePanel() {
       pwEvent('pw_glaze_panel_opened');
-      document.getElementById('glaze-panel').style.display = 'flex';
-      document.getElementById('glaze-hint').style.display = 'block';
+      showEl('glaze-panel');
+      showEl('glaze-hint');
       startGlazeShakeCycle();
     }
     function hideGlazePanel() {
-      document.getElementById('glaze-panel').style.display = 'none';
-      document.getElementById('glaze-hint').style.display = 'none';
+      hideEl('glaze-panel');
+      hideEl('glaze-hint');
       stopGlazeShake();
     }
     function stopGlazeShake() {
       clearInterval(_shakeInterval);
       _shakeInterval = null;
       document.querySelectorAll('.glaze-opt').forEach(el => el.classList.remove('shake'));
-      document.getElementById('glaze-hint').style.display = 'none';
+      hideEl('glaze-hint');
     }
 
     // ── interaction ────────────────────────────────────────────────────────────
@@ -1966,10 +1975,10 @@
       glazingReady = false;
       masterReady = true;
       scene.background = makeBg();
-      document.getElementById('fire-btn2').style.display = 'none';
+      hideEl('fire-btn2');
       hideGlazePanel();
       document.getElementById('glaze-panel').querySelectorAll('.glaze-opt').forEach(el => el.classList.remove('active'));
-      skipBtn.style.display = 'none';
+      hideEl('skip-btn');
       enterFlowerStage();
     }
 
@@ -1993,11 +2002,11 @@
       camera.lookAt(0, 0.5, 0);
       if (innerWidth < innerHeight) { camera.fov = 68; camera.updateProjectionMatrix(); }
 
-      document.getElementById('pick-flowers-btn').style.display = 'none';
-      document.getElementById('flower-hint').style.display = 'block';
-      document.getElementById('remove-flowers-btn').style.display = 'block';
-      document.getElementById('share-btn').style.display = 'block';
-      document.getElementById('reset').style.display = 'none';
+      hideEl('pick-flowers-btn');
+      showEl('flower-hint');
+      showEl('remove-flowers-btn');
+      showEl('share-btn');
+      hideEl('reset');
       setupFlowerStage();
       flowerStageGroup.visible = true;
       bouquetGroup.visible = true;
@@ -2030,9 +2039,10 @@
       glazingReady = true;
       wheelGroup.visible = true;
       showGlazePanel();
-      document.getElementById('fire-btn2').style.display = 'block';
+      showEl('fire-btn2');
+      showEl('reset');
       scene.background = makeBg();
-      skipBtn.style.display = 'none';
+      hideEl('skip-btn');
     }
 
     skipBtn.addEventListener('click', () => {
@@ -2051,8 +2061,9 @@
         stageLabel.style.transition = 'none';
         stageLabel.style.opacity = '0';
         stageLabel.style.display = 'none';
-        document.getElementById('fire-btn').style.display = 'block';
-        skipBtn.style.display = 'none';
+        showEl('reset');
+        showEl('fire-btn');
+        hideEl('skip-btn');
         if (!hasInteracted) {
           setTimeout(() => {
             stageLabel.textContent = 'Use Your Mouse to Shape the Clay';
@@ -2079,7 +2090,7 @@
       clayMat.roughness = 0.82; clayMat.metalness = 0; clayMat.needsUpdate = true;
       capMat.map = null; capMat.color.setHex(0x7A6E65);
       capMat.roughness = 0.82; capMat.metalness = 0; capMat.needsUpdate = true;
-      document.getElementById('fire-btn').style.display = 'block';
+      showEl('fire-btn');
       document.getElementById('fire-btn').textContent = 'Fire Kiln';
       fired = false;
       hasInteracted = false;
@@ -2128,8 +2139,9 @@
       if (animating || fired) return;
       fired = true;
       pwEvent('pw_fired_first');
-      document.getElementById('fire-btn').style.display = 'none';
-      document.getElementById('hint').style.display = 'none';
+      hideEl('fire-btn');
+      hideEl('reset');
+      hideEl('hint');
       shapeHintShown = false;
       stageLabel.style.display = 'none';
 
@@ -2153,7 +2165,7 @@
           overlay.style.pointerEvents = 'none';
           // 4. Fire emojis orbit the vase — kiln scene fully loaded, now show skip
           spawnFireEmojis();
-          skipBtn.style.display = 'block';
+          showEl('skip-btn');
 
           firingTimeout(() => {
             // 5. Fire disappears first, then fade to black
@@ -2175,9 +2187,10 @@
               glazingReady = true;
               tableGroup.visible = true;
               showGlazePanel();
-              document.getElementById('fire-btn2').style.display = 'block';
+              showEl('fire-btn2');
+              showEl('reset');
               scene.background = makeBg();
-              skipBtn.style.display = 'none';
+              hideEl('skip-btn');
 
               // 7. Fade back in to reveal finished scene
               overlay.style.transition = 'opacity 1.0s ease';
@@ -2194,9 +2207,9 @@
       if (!glazingReady || fired2) return;
       fired2 = true;
       pwEvent('pw_glaze_fired', { glaze_name: selectedGlaze !== null ? glazeDefs[selectedGlaze].label : 'none' });
-      document.getElementById('fire-btn2').style.display = 'none';
+      hideEl('fire-btn2');
+      hideEl('reset');
       hideGlazePanel();
-      skipBtn.style.display = 'block';
       renderer.domElement.style.cursor = 'default';
 
       overlay.style.transition = 'opacity 0.8s ease';
@@ -2213,6 +2226,7 @@
         firingTimeout(() => {
           overlay.style.pointerEvents = 'none';
           spawnFireEmojis();
+          showEl('skip-btn');
 
           firingTimeout(() => {
             hideFireEmojis();
@@ -2232,7 +2246,7 @@
               scene.background = makeBg();
               masterReady = true;
               glazingReady = false;
-              skipBtn.style.display = 'none';
+              hideEl('skip-btn');
               renderer.domElement.style.cursor = 'default';
 
               enterFlowerStage();  // reposition while overlay is still opaque
@@ -2287,7 +2301,7 @@
       flowersInVase = 0;
       camera.fov = 42; camera.updateProjectionMatrix();
       const gp = document.getElementById('glaze-panel');
-      gp.style.display = 'none';
+      hideEl('glaze-panel');
       gp.querySelectorAll('.glaze-opt').forEach(el => el.classList.remove('active'));
       glazingReady = false;
       fired2 = false;
@@ -2302,13 +2316,11 @@
       overlay.style.opacity = '0';
       overlay.style.pointerEvents = 'none';
       hideFireEmojis();
-      skipBtn.style.display = 'none';
-      document.getElementById('fire-btn2').style.display = 'none';
-      document.getElementById('pick-flowers-btn').style.display = 'none';
-      document.getElementById('flower-hint').style.display = 'none';
-      document.getElementById('remove-flowers-btn').style.display = 'none';
-      document.getElementById('share-btn').style.display = 'none';
-      document.getElementById('share-controls').style.display = 'none';
+      hideEl('skip-btn');
+      ['fire-btn2','pick-flowers-btn','flower-hint','remove-flowers-btn','share-btn','share-controls'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.style.opacity = '0'; el.style.display = 'none'; }
+      });
       steamParticles.forEach(p => { shareSceneGroup.remove(p.mesh); p.mesh.geometry.dispose(); p.mesh.material.dispose(); });
       steamParticles.length = 0;
       cupData.forEach(c => { c.state = 'idle'; c.t = 0; if (c.liquidMesh) c.liquidMesh.position.y = 0.166; });
@@ -2570,10 +2582,10 @@
       });
       cupData.forEach(c => { c.state = 'idle'; c.t = 0; if (c.liquidMesh) c.liquidMesh.position.y = 0.166; });
 
-      document.getElementById('remove-flowers-btn').style.display = 'none';
-      document.getElementById('flower-hint').style.display = 'none';
-      document.getElementById('share-btn').style.display = 'none';
-      document.getElementById('share-controls').style.display = 'flex';
+      hideEl('remove-flowers-btn');
+      hideEl('flower-hint');
+      hideEl('share-btn');
+      showEl('share-controls');
     }
 
     document.getElementById('share-btn').addEventListener('click', () => {
@@ -2686,7 +2698,8 @@
           } else {
             // Opening done — hand control to user for pulling walls
             animating = false;
-            skipBtn.style.display = 'none';
+            showEl('reset');
+            hideEl('skip-btn');
             radii = [...KF_CYLINDER];
             clayH  = ANIM[ANIM.length - 1].hB;
             topCapOpacity = 0;
@@ -2702,7 +2715,7 @@
               stageLabel.style.opacity = '1';
               shapeHintShown = true;
             }, 150);
-            document.getElementById('fire-btn').style.display = 'block';
+            showEl('fire-btn');
           }
         }
 

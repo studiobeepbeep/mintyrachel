@@ -1252,6 +1252,12 @@
           closeOverlay();
         }
       });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) {
+          closeOverlay();
+        }
+      });
     })();
   </script>
 
