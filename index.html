@@ -720,7 +720,7 @@
 
     /* ── MOBILE ── */
     @media (max-width: 680px) {
-      nav { padding: 1rem 1.2rem; align-items: center; }
+      nav { padding: 0.5rem 1.2rem; align-items: center; }
       .brand { font-size: 2.0rem; display: flex; align-items: center; }
       .nav-hamburger { align-self: center; padding: 0; }
       .nav-hamburger { display: flex; }
@@ -748,8 +748,9 @@
       .contact-grid { grid-template-columns: 1fr; }
       .page-wrap { margin-top: 1.5rem; }
 
-      /* fill viewport below nav on mobile, no scroll */
-      #tab-home { height: calc(100dvh - 64px); overflow: hidden; }
+      /* fill full viewport on mobile — negative margin pulls tab behind nav so
+         monitor centers in the whole screen, not just the below-nav strip */
+      #tab-home { height: 100svh; margin-top: -48px; overflow: hidden; }
       .monitor-scene { height: 100%; overflow: hidden; position: relative; }
       .monitor-frame { position: absolute; width: 270%; left: -50.6%; top: 50%; transform: translateY(-50%); }
 
