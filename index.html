@@ -207,23 +207,50 @@
     /* About Me */
     .about-layout {
       display: grid;
-      grid-template-columns: 1fr 1.5fr;
-      gap: 4rem;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 3rem;
       align-items: start;
       margin-top: 1rem;
+      max-width: min(1100px, 96vw);
     }
     .about-photo {
+      position: relative;
       aspect-ratio: 3 / 4;
-      border-radius: 20px;
-      background: var(--panel);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 0.6rem;
-      color: var(--mid); font-size: 0.8rem; font-style: italic;
-      box-shadow: 0 8px 28px rgba(92,36,56,0.10);
+      overflow: hidden;
     }
-    .about-photo .icon { font-size: 2.5rem; }
-    .about-text { display: flex; flex-direction: column; gap: 1.6rem; padding-top: 0.5rem; }
+    .about-gameboy {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+    .about-photo { transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+    .dpad-overlay {
+      position: absolute;
+      left: 25%; top: 53%; width: 15%; height: 13%;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .about-screen {
+      position: absolute;
+      left: 33%;
+      top: 21%;
+      width: 33%;
+      height: 23%;
+      overflow: hidden;
+    }
+    .about-screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 20%;
+    }
+    .about-text { display: flex; flex-direction: column; gap: 1.6rem; padding-top: 4rem; }
     .about-text h2 { font-size: clamp(2rem,4.5vw,3rem); font-weight: 700; font-style: italic; line-height: 1.05; }
     .about-bio {
       background: var(--panel); border-radius: 16px;
@@ -247,7 +274,9 @@
     .about-links a svg { width: 18px; height: 18px; flex-shrink: 0; }
     .about-links a:hover { color: var(--dark); }
     @media (max-width: 680px) {
-      .about-layout { grid-template-columns: 1fr; gap: 2rem; }
+      .about-layout { grid-template-columns: 1fr; gap: 0; }
+      .about-text { padding-top: 0; }
+      .about-photo { aspect-ratio: 3 / 3.4; }
     }
 
     /* ── SHARED PAGE LAYOUT ── */
@@ -1063,11 +1092,15 @@
     <div class="page-wrap">
       <div class="about-layout">
         <div class="about-photo">
-          <img src="images/rachel.jpg" alt="Rachel Min" style="width:100%;height:100%;object-fit:cover;border-radius:20px;"/>
+          <div class="about-screen">
+            <img src="images/rachel2.jpg" alt="Rachel Min">
+          </div>
+          <img class="about-gameboy" src="images/gameboy.png" alt="Game Boy" draggable="false">
+          <div class="dpad-overlay" id="dpad-overlay"></div>
         </div>
         <div class="about-text">
           <div class="about-bio">
-            <p>I'm a ceramic artist, coder, and educator based in New York, making functional and sculptural work. Before clay, I was a software engineer at Figma and Meta. I've always found ways to teach, no matter what else I was doing. I studied Computer Science, Chemistry, and Art at Carnegie Mellon. I currently teach wheel-throwing and hand-building workshops, and I sell small batches of work at local craft fairs and through Instagram.</p>
+            <p>I'm a ceramic artist, coder, and educator based in New York, making functional and sculptural work. Before clay, I was a software engineer at Figma and Meta. I've always found ways to teach, no matter what else I was doing. I studied Computer Science, Chemistry, and Art at Carnegie Mellon. I currently teach hand-building workshops and sell small batches of work at local craft fairs and through Instagram.</p>
             <p>I'm currently thinking about how to embed hardware into clay.</p>
           </div>
           <div class="about-links">
@@ -1271,6 +1304,27 @@
         if (e.key === 'Escape' && overlay.classList.contains('active')) {
           closeOverlay();
         }
+      });
+    })();
+
+    // D-pad easter egg: click to shift the gameboy ±1 step per axis
+    (function() {
+      const SHIFT = 38; // px per step
+      let sx = 0, sy = 0; // current step: -1, 0, or 1
+
+      document.getElementById('dpad-overlay').addEventListener('click', function(e) {
+        const rect = this.getBoundingClientRect();
+        const dx = e.clientX - (rect.left + rect.width / 2);
+        const dy = e.clientY - (rect.top + rect.height / 2);
+
+        if (Math.abs(dx) >= Math.abs(dy)) {
+          sx = dx > 0 ? Math.min(1, sx + 1) : Math.max(-1, sx - 1);
+        } else {
+          sy = dy > 0 ? Math.min(1, sy + 1) : Math.max(-1, sy - 1);
+        }
+
+        document.querySelector('.about-photo').style.transform =
+          `translate(${sx * SHIFT}px, ${sy * SHIFT}px)`;
       });
     })();
   </script>
