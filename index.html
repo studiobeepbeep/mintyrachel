@@ -68,8 +68,9 @@
       color: var(--dark);
       text-decoration: none;
       letter-spacing: 0.05em;
-      transition: color 0.2s;
+      transition: color 0.2s, opacity 0.15s;
       line-height: 1;
+      opacity: 0;
     }
     .brand:hover { color: var(--mid); }
     .nav-tabs { display: flex; gap: 2.2rem; }
@@ -1098,6 +1099,14 @@
   </button>
 
   <script>
+    // Show brand only after Dirtyline loads to avoid FOUT; fallback after 4s
+    (function() {
+      const brand = document.querySelector('.brand');
+      const show = () => { brand.style.opacity = '1'; };
+      const t = setTimeout(show, 4000);
+      document.fonts.load("normal normal 2.8rem 'Dirtyline'").then(() => { clearTimeout(t); show(); }).catch(show);
+    })();
+
     const panels = document.querySelectorAll('.tab-panel');
     const links  = document.querySelectorAll('[data-tab]');
 
