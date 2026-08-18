@@ -348,7 +348,7 @@
     pwEvent('pw_game_opened');
 
     // ── impressionist sunflower background ────────────────────────────────────
-    function makeSunflowerBg(W = 1200, H = 800) {
+    function makeSunflowerBg(W = 1200, H = 800, windowY = null, winBottom = null) {
       const c = document.createElement('canvas');
       c.width = W; c.height = H;
       const ctx = c.getContext('2d');
@@ -688,7 +688,9 @@
 
       // ── 6. WINDOW FRAME ──
       const FW = 46, MW = 20;
-      const MX = W/2 - MW/2, MY = H*0.44;
+      const WB = winBottom !== null ? winBottom : H; // bottom edge of window
+      const MX = W/2 - MW/2;
+      const MY = windowY !== null ? windowY : WB * 0.44;
       const wFace='#2E1608', wLight='#5C3018', wMid='#3E1E0C', wDark='#0A0200', BV=6;
 
       function woodBar(x, y, w, h, innerSides) {
@@ -745,23 +747,23 @@
 
       const SH = 22;
       ctx.save();
-      const sg2 = ctx.createLinearGradient(0, H-FW-SH, 0, H-FW-SH+SH);
+      const sg2 = ctx.createLinearGradient(0, WB-FW-SH, 0, WB-FW-SH+SH);
       sg2.addColorStop(0, wLight); sg2.addColorStop(1, wDark);
       ctx.fillStyle = sg2;
-      ctx.fillRect(-4, H-FW-SH+4, W+8, SH);
+      ctx.fillRect(-4, WB-FW-SH+4, W+8, SH);
       ctx.restore();
 
-      woodBar(MX, 0, MW, H, 'lr');
-      woodBar(0, MY, W, MW, 'tb');
-      woodBar(0,      0,   W,  FW, 'b');
-      woodBar(0,   H-FW,  W,  FW, 't');
-      woodBar(0,      0,  FW,  H,  'r');
-      woodBar(W-FW,   0,  FW,  H,  'l');
+      woodBar(MX,    0,   MW, WB,      'lr');
+      woodBar(0,     MY,  W,  MW,      'tb');
+      woodBar(0,     0,   W,  FW,      'b');
+      woodBar(0,     WB-FW, W, FW,    't');
+      woodBar(0,     0,   FW, WB,      'r');
+      woodBar(W-FW,  0,   FW, WB,      'l');
 
-      glassPane(FW,    FW,    MX-FW,       MY-FW);
-      glassPane(MX+MW, FW,    W-FW-MX-MW,  MY-FW);
-      glassPane(FW,    MY+MW, MX-FW,        H-FW-MY-MW);
-      glassPane(MX+MW, MY+MW, W-FW-MX-MW,  H-FW-MY-MW);
+      glassPane(FW,    FW,    MX-FW,      MY-FW);
+      glassPane(MX+MW, FW,    W-FW-MX-MW, MY-FW);
+      glassPane(FW,    MY+MW, MX-FW,       WB-FW-MY-MW);
+      glassPane(MX+MW, MY+MW, W-FW-MX-MW,  WB-FW-MY-MW);
 
       return c;
     }
@@ -945,27 +947,6 @@
       tableGroup.add(leg);
     });
 
-    // ── display pedestal (shown in final stage) ───────────────────────────────
-    const pedestalGroup = new THREE.Group();
-    scene.add(pedestalGroup);
-    pedestalGroup.visible = false;
-
-    const marbMat = new THREE.MeshStandardMaterial({ color: 0xF0EBE0, roughness: 0.22, metalness: 0.03 });
-    // Shaft — tapers gently from base to top
-    const pedShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.40, 3.4, 40), marbMat);
-    pedShaft.position.y = -0.9;
-    pedShaft.castShadow = true; pedShaft.receiveShadow = true;
-    pedestalGroup.add(pedShaft);
-    // Capital (top plate)
-    const pedCap = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.52, 0.10, 40), marbMat);
-    pedCap.position.y = 0.75;
-    pedCap.castShadow = true;
-    pedestalGroup.add(pedCap);
-    // Base plinth
-    const pedBase = new THREE.Mesh(new THREE.CylinderGeometry(0.58, 0.65, 0.20, 40), marbMat);
-    pedBase.position.y = -2.62;
-    pedBase.receiveShadow = true;
-    pedestalGroup.add(pedBase);
 
     // Spotlight for the final stage (hidden until then)
     const spotlight = new THREE.SpotLight(0xfff8e8, 0, 12, Math.PI * 0.18, 0.4, 1.5);
@@ -1996,10 +1977,9 @@
       if (flowerStage) return;
       flowerStage = true;
 
-      // Show wheel (stationary), hide pedestal
+      // Show wheel (stationary) for flower arrangement
       wheelGroup.visible = true;
       wheelGroup.rotation.y = 0;
-      pedestalGroup.visible = false;
       spotlight.intensity = 0;
 
       // Move vase back to wheel level, rotate 180° to hide glaze seam
@@ -2048,7 +2028,7 @@
       capMat.color.setHex(0xC8712A);
       clayGroup.position.set(0, -1.1, 0);
       glazingReady = true;
-      tableGroup.visible = true;
+      wheelGroup.visible = true;
       showGlazePanel();
       document.getElementById('fire-btn2').style.display = 'block';
       scene.background = makeBg();
@@ -2225,6 +2205,7 @@
 
       firingTimeout(() => {
         tableGroup.visible = false;
+        wheelGroup.visible = false;
         scene.background = new THREE.Color(0x0A0500);
         overlay.style.transition = 'opacity 0.9s ease';
         overlay.style.opacity = '0';
@@ -2287,7 +2268,6 @@
       firingTimeouts.length = 0;
       selectedGlaze = null;
       tableGroup.visible = false;
-      pedestalGroup.visible = false;
       spotlight.intensity = 0;
       flowerStageGroup.visible = false;
       bouquetGroup.visible = false;
@@ -2383,7 +2363,8 @@
       const tableD = sharePortrait ? 18 : 1.6;
       // Keep the far (top) edge at z=-0.8 (same as original 1.6-depth table),
       // only extend toward camera so the near edge goes off-screen at the bottom.
-      const tableZCenter = sharePortrait ? tableD / 2 - 0.8 : 0;
+      const tableZCenter = sharePortrait ? tableD / 2 - 2.8 : 0;
+      if (sharePortrait) shareSceneGroup.userData.tableBackEdgeZ = tableZCenter - tableD / 2;
       const tableTop = new THREE.Mesh(new THREE.BoxGeometry(tableW, 0.10, tableD), woodMat);
       tableTop.position.set(0, -1.15, tableZCenter);
       tableTop.receiveShadow = true;
@@ -2391,7 +2372,7 @@
 
       const grainZ = tableD - 0.02;
       if (sharePortrait) {
-        const grainSpacing = 0.55;
+        const grainSpacing = 1.1;
         // Center line so gap at x=0 matches all other gaps
         const centerStrip = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.003, grainZ), grainMat);
         centerStrip.position.set(0, -1.099, tableZCenter);
@@ -2454,7 +2435,7 @@
 
       // Cups
       const steamOrigins = [];
-      const cupX = sharePortrait ? 1.3 : 1.10;
+      const cupX = sharePortrait ? 1.6 : 1.10;
       [[-cupX, 0.22], [cupX, -0.22]].forEach(([cx, cz]) => {
         const cupIdx = cupData.length;
         const grp = new THREE.Group();
@@ -2488,11 +2469,13 @@
           new THREE.Vector3(0.081, 0.131, 0)
         );
         const handle = new THREE.Mesh(new THREE.TubeGeometry(hCurve, 10, 0.011, 8, false), porcelain);
+        if (sharePortrait && cx < 0) handle.scale.x = -1;
         grp.add(handle);
         allCupMeshes.push({ mesh: handle, cupIdx });
         grp.position.set(cx, -1.099, cz);
-        if (sharePortrait) grp.scale.setScalar(2.0);
+        if (sharePortrait) grp.scale.setScalar(2.6);
         shareSceneGroup.add(grp);
+        if (sharePortrait) (shareSceneGroup.userData.cupGroups = shareSceneGroup.userData.cupGroups || []).push(grp);
         cupData.push({ liquidMesh: liquid, state: 'idle', t: 0 });
         steamOrigins.push({ x: cx, y: -1.099 + 0.170, z: cz });
       });
@@ -2516,12 +2499,12 @@
       // Capture original vase Y *before* changing it — flowers were placed
       // relative to that position and the bouquet offset depends on it.
       const originalVaseY  = clayGroup.position.y;   // -1.1
-      const sceneDropY = innerWidth < innerHeight ? -1.2 : -0.5;
+      const sceneDropY = innerWidth < innerHeight ? -2.4 : -0.5;
       shareSceneGroup.position.y = sceneDropY;
       clayGroup.position.y = originalVaseY + sceneDropY;
 
       // Scale vase down to fit the dining table
-      const shareVaseScale = innerWidth < innerHeight ? 0.58 : 0.35;
+      const shareVaseScale = innerWidth < innerHeight ? 0.75 : 0.35;
       clayGroup.scale.setScalar(shareVaseScale);
 
       // Uniform scale — no stretching
@@ -2529,6 +2512,15 @@
 
       // Keep flower heads at the correct height; stems extend down into the vase
       bouquetGroup.position.y = clayGroup.position.y - shareVaseScale * originalVaseY;
+
+      // On mobile portrait, push vase toward the back of the table so it
+      // appears higher on screen, closer to the window.
+      if (innerWidth < innerHeight) {
+        clayGroup.position.z = -0.8;
+        bouquetGroup.position.z = -0.8;
+        (shareSceneGroup.userData.cupGroups || []).forEach(g => { g.position.z -= 1.0; });
+        (shareSceneGroup.userData.steamOrigins || []).forEach(o => { o.z -= 1.0; });
+      }
 
       // Add a downward stem extension to each flower so the stem visually
       // disappears into the vase body rather than cutting off at the rim.
@@ -2543,7 +2535,17 @@
 
       if (innerWidth < innerHeight) {
         camera.position.set(0, 0.2, 4.2);
-        camera.lookAt(0, -1.5, 0);
+        camera.lookAt(0, -1.0, 0);
+        camera.updateMatrixWorld();
+        // Project the table's back edge to find where it actually falls on-screen,
+        // regardless of the current FOV (flower stage may have left it at 68°).
+        const tableWorldY = -1.15 + sceneDropY;
+        const tableEdgeZ = shareSceneGroup.userData.tableBackEdgeZ || -2.8;
+        const edgePt = new THREE.Vector3(0, tableWorldY, tableEdgeZ);
+        edgePt.project(camera); // NDC y: +1 = top, -1 = bottom
+        const wb = Math.round(Math.max(0.3, Math.min(0.75, (1 - edgePt.y) / 2)) * 1200);
+        const my = Math.round(46 + (wb - 92) / 2);
+        scene.background = new THREE.CanvasTexture(makeSunflowerBg(800, 1200, my, wb));
       } else {
         camera.position.set(0, 1.4, 5.8);
         camera.lookAt(0, -0.2, 0);
@@ -2583,43 +2585,60 @@
     function captureScene() {
       renderer.render(scene, camera);
       const src = renderer.domElement;
-      // Output as 4:5 portrait — Instagram's optimal feed ratio
-      const outW = 1080, outH = 1350;
+      const portrait = innerWidth < innerHeight;
+      // Mobile: 4:5 portrait crop (Instagram feed); Desktop: full canvas
+      const outW = portrait ? 1080 : src.width;
+      const outH = portrait ? 1350 : src.height;
       const c = document.createElement('canvas');
       c.width = outW; c.height = outH;
       const ctx = c.getContext('2d');
-      // Fill background colour in case of letterboxing
       ctx.fillStyle = '#a8d8ea';
       ctx.fillRect(0, 0, outW, outH);
-      // Center-crop src to fill the 4:5 frame
-      const srcAspect = src.width / src.height;
-      const outAspect = outW / outH;
-      let sx, sy, sw, sh;
-      if (srcAspect > outAspect) {
-        sh = src.height; sw = sh * outAspect;
-        sx = (src.width - sw) / 2; sy = 0;
+      if (portrait) {
+        // Center-crop to 4:5 frame
+        const srcAspect = src.width / src.height;
+        const outAspect = outW / outH;
+        let sx, sy, sw, sh;
+        if (srcAspect > outAspect) {
+          sh = src.height; sw = sh * outAspect;
+          sx = (src.width - sw) / 2; sy = 0;
+        } else {
+          sw = src.width; sh = sw / outAspect;
+          sx = 0; sy = (src.height - sh) / 2;
+        }
+        ctx.drawImage(src, sx, sy, sw, sh, 0, 0, outW, outH);
       } else {
-        sw = src.width; sh = sw / outAspect;
-        sx = 0; sy = (src.height - sh) / 2;
+        ctx.drawImage(src, 0, 0);
       }
-      ctx.drawImage(src, sx, sy, sw, sh, 0, 0, outW, outH);
-      const text     = 'mintyrachel.com';
-      const fontSize = Math.max(18, Math.round(outH * 0.018));
+      const text     = 'made with love on mintyrachel.com';
+      const fontSize = Math.max(28, Math.round(outH * 0.032));
       const pad      = Math.round(outH * 0.016);
       ctx.font         = `italic ${fontSize}px Georgia, serif`;
-      ctx.textAlign    = 'right';
+      ctx.textAlign    = 'center';
       ctx.textBaseline = 'bottom';
       ctx.shadowColor  = 'rgba(0,0,0,0.55)';
       ctx.shadowBlur   = 8;
       ctx.fillStyle    = 'rgba(255,255,255,0.75)';
-      ctx.fillText(text, outW - pad, outH - pad);
+      ctx.fillText(text, outW / 2, outH - pad);
       return c.toDataURL('image/jpeg', 0.93);
     }
 
-    document.getElementById('share-photo-btn').addEventListener('click', () => {
+    document.getElementById('share-photo-btn').addEventListener('click', async () => {
       pwEvent('pw_downloaded');
+      const dataUrl = captureScene();
+      if (innerWidth < innerHeight && navigator.canShare) {
+        try {
+          const res = await fetch(dataUrl);
+          const blob = await res.blob();
+          const file = new File([blob], 'my-pottery-vase.jpg', { type: 'image/jpeg' });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file] });
+            return;
+          }
+        } catch (err) { /* fallthrough to download */ }
+      }
       const a = document.createElement('a');
-      a.href = captureScene();
+      a.href = dataUrl;
       a.download = 'my-pottery-vase.jpg';
       a.click();
     });
@@ -2782,6 +2801,10 @@
     }
 
     animate();
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') window.parent.postMessage('pw_escape', '*');
+    });
   })();
   </script>
 </body>
