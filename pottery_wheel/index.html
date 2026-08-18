@@ -2193,7 +2193,7 @@
               capMat.color.setHex(0xC8712A);
               clayGroup.position.set(0, -1.1, 0);
               glazingReady = true;
-              tableGroup.visible = true;
+              wheelGroup.visible = true;
               showGlazePanel();
               document.getElementById('fire-btn2').style.display = 'block';
               scene.background = makeBg();
@@ -2224,7 +2224,7 @@
       overlay.style.pointerEvents = 'all';
 
       firingTimeout(() => {
-        tableGroup.visible = false;
+        wheelGroup.visible = false;
         scene.background = new THREE.Color(0x0A0500);
         overlay.style.transition = 'opacity 0.9s ease';
         overlay.style.opacity = '0';
@@ -2583,28 +2583,34 @@
     function captureScene() {
       renderer.render(scene, camera);
       const src = renderer.domElement;
-      // Output as 4:5 portrait — Instagram's optimal feed ratio
-      const outW = 1080, outH = 1350;
+      const portrait = innerWidth < innerHeight;
+      // Mobile: 4:5 portrait (Instagram feed); Desktop: full landscape canvas
+      const outW = portrait ? 1080 : src.width;
+      const outH = portrait ? 1350 : src.height;
       const c = document.createElement('canvas');
       c.width = outW; c.height = outH;
       const ctx = c.getContext('2d');
-      // Fill background colour in case of letterboxing
       ctx.fillStyle = '#a8d8ea';
       ctx.fillRect(0, 0, outW, outH);
-      // Center-crop src to fill the 4:5 frame
-      const srcAspect = src.width / src.height;
-      const outAspect = outW / outH;
-      let sx, sy, sw, sh;
-      if (srcAspect > outAspect) {
-        sh = src.height; sw = sh * outAspect;
-        sx = (src.width - sw) / 2; sy = 0;
+      if (portrait) {
+        // Center-crop to 4:5 frame
+        const srcAspect = src.width / src.height;
+        const outAspect = outW / outH;
+        let sx, sy, sw, sh;
+        if (srcAspect > outAspect) {
+          sh = src.height; sw = sh * outAspect;
+          sx = (src.width - sw) / 2; sy = 0;
+        } else {
+          sw = src.width; sh = sw / outAspect;
+          sx = 0; sy = (src.height - sh) / 2;
+        }
+        ctx.drawImage(src, sx, sy, sw, sh, 0, 0, outW, outH);
       } else {
-        sw = src.width; sh = sw / outAspect;
-        sx = 0; sy = (src.height - sh) / 2;
+        // Full canvas, no crop
+        ctx.drawImage(src, 0, 0);
       }
-      ctx.drawImage(src, sx, sy, sw, sh, 0, 0, outW, outH);
       const text     = 'mintyrachel.com';
-      const fontSize = Math.max(18, Math.round(outH * 0.018));
+      const fontSize = Math.max(28, Math.round(outH * 0.032));
       const pad      = Math.round(outH * 0.016);
       ctx.font         = `italic ${fontSize}px Georgia, serif`;
       ctx.textAlign    = 'right';
@@ -2616,10 +2622,22 @@
       return c.toDataURL('image/jpeg', 0.93);
     }
 
-    document.getElementById('share-photo-btn').addEventListener('click', () => {
+    document.getElementById('share-photo-btn').addEventListener('click', async () => {
       pwEvent('pw_downloaded');
+      const dataUrl = captureScene();
+      if (innerWidth < innerHeight && navigator.canShare) {
+        try {
+          const res = await fetch(dataUrl);
+          const blob = await res.blob();
+          const file = new File([blob], 'my-pottery-vase.jpg', { type: 'image/jpeg' });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file] });
+            return;
+          }
+        } catch (err) { /* fallthrough to download */ }
+      }
       const a = document.createElement('a');
-      a.href = captureScene();
+      a.href = dataUrl;
       a.download = 'my-pottery-vase.jpg';
       a.click();
     });
@@ -2782,6 +2800,10 @@
     }
 
     animate();
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') window.parent.postMessage('pw_escape', '*');
+    });
   })();
   </script>
 </body>

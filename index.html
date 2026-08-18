@@ -1245,6 +1245,12 @@
           closeOverlay();
         }
       });
+
+      window.addEventListener('message', (e) => {
+        if (e.data === 'pw_escape' && overlay.classList.contains('active')) {
+          closeOverlay();
+        }
+      });
     })();
   </script>
 
