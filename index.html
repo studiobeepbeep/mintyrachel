@@ -177,11 +177,24 @@
       from { opacity: 0; }
       to   { opacity: 1; }
     }
+    .play-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      gap: clamp(4px, 0.5vw, 8px);
+      animation: playblink 1.8s ease-in-out infinite;
+    }
     .play-btn {
       width: clamp(40px, 5vw, 80px);
       height: clamp(40px, 5vw, 80px);
       filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
-      animation: playblink 1.8s ease-in-out infinite;
+    }
+    .play-label {
+      font-size: clamp(9px, 0.8vw, 13px);
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      margin-right: -0.25em; /* balance trailing letter-spacing so it stays centered */
+      color: rgba(60,60,60,0.85);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      user-select: none;
     }
     @keyframes playblink {
       0%,100% { opacity: 1; transform: scale(1); }
@@ -257,7 +270,7 @@
       padding: 1.6rem 1.8rem;
       display: flex; flex-direction: column; gap: 1rem;
     }
-    .about-bio p { font-size: 0.93rem; line-height: 1.85; color: var(--dark); font-style: italic; }
+    .about-bio p { font-size: 0.93rem; line-height: 1.85; color: var(--dark); }
     .about-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
     .about-tag {
       font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700;
@@ -816,10 +829,13 @@
         <iframe class="monitor-iframe" src="pottery_wheel/index.html?preview=1" title="Pottery Wheel" scrolling="no"></iframe>
         <div class="screen-fx"></div>
         <div class="play-screen" id="play-screen">
-          <svg class="play-btn" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="44" fill="rgba(0,0,0,0.12)" stroke="rgba(60,60,60,0.75)" stroke-width="2.5"/>
-            <polygon points="38,28 76,50 38,72" fill="rgba(60,60,60,0.85)"/>
-          </svg>
+          <div class="play-wrap">
+            <svg class="play-btn" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="44" fill="rgba(0,0,0,0.12)" stroke="rgba(60,60,60,0.75)" stroke-width="2.5"/>
+              <polygon points="38,28 76,50 38,72" fill="rgba(60,60,60,0.85)"/>
+            </svg>
+            <span class="play-label">PLAY</span>
+          </div>
         </div>
         <svg class="monitor-svg" viewBox="0 0 2000 1000" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <image href="images/tvstock1.png" width="2000" height="1000"/>
@@ -1176,6 +1192,8 @@
         playScreen.style.animation = 'none';
         playScreen.style.opacity = '1';
       }
+
+      document.dispatchEvent(new CustomEvent('tabchange', { detail: name }));
     }
 
     // Hamburger menu
@@ -1307,24 +1325,45 @@
       });
     })();
 
-    // D-pad easter egg: click to shift the gameboy ±1 step per axis
+    // D-pad easter egg: click to shift the gameboy up to ±2 steps per axis
     (function() {
-      const SHIFT = 38; // px per step
-      let sx = 0, sy = 0; // current step: -1, 0, or 1
+      const SHIFT = 32; // px per step
+      const MAX = 2;    // steps allowed in each direction
+      let sx = 0, sy = 0; // current step: -MAX..MAX
+      let lastDir = null;
+      const photo = document.querySelector('.about-photo');
 
       document.getElementById('dpad-overlay').addEventListener('click', function(e) {
-        const rect = this.getBoundingClientRect();
-        const dx = e.clientX - (rect.left + rect.width / 2);
-        const dy = e.clientY - (rect.top + rect.height / 2);
-
-        if (Math.abs(dx) >= Math.abs(dy)) {
-          sx = dx > 0 ? Math.min(1, sx + 1) : Math.max(-1, sx - 1);
+        let dir;
+        // The gameboy slides out from under the cursor, so the second click
+        // of a double-click (browser-detected, same spot) repeats the arrow.
+        if (e.detail > 1 && lastDir) {
+          dir = lastDir;
         } else {
-          sy = dy > 0 ? Math.min(1, sy + 1) : Math.max(-1, sy - 1);
+          // Otherwise judge the click against where the d-pad is headed,
+          // not where it is mid-slide.
+          const rect = this.getBoundingClientRect();
+          const t = getComputedStyle(photo).transform;
+          const now = new DOMMatrixReadOnly(t === 'none' ? undefined : t);
+          const dx = e.clientX - (rect.left + rect.width / 2 - now.m41 + sx * SHIFT);
+          const dy = e.clientY - (rect.top + rect.height / 2 - now.m42 + sy * SHIFT);
+          dir = Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
         }
+        lastDir = dir;
 
-        document.querySelector('.about-photo').style.transform =
-          `translate(${sx * SHIFT}px, ${sy * SHIFT}px)`;
+        if (dir === 'right') sx = Math.min(MAX, sx + 1);
+        if (dir === 'left') sx = Math.max(-MAX, sx - 1);
+        if (dir === 'down') sy = Math.min(MAX, sy + 1);
+        if (dir === 'up') sy = Math.max(-MAX, sy - 1);
+
+        photo.style.transform = `translate(${sx * SHIFT}px, ${sy * SHIFT}px)`;
+      });
+
+      // Leaving the About tab puts the gameboy back where it started.
+      document.addEventListener('tabchange', e => {
+        if (e.detail === 'about') return;
+        sx = 0; sy = 0; lastDir = null;
+        photo.style.transform = '';
       });
     })();
   </script>
