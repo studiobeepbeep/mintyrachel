@@ -814,7 +814,7 @@
     </button>
     <div class="nav-tabs">
       <a href="#home"        class="nav-link active" data-tab="home">Home</a>
-      <a href="#ceramics"    class="nav-link"        data-tab="ceramics">Ceramics</a>
+      <a href="#portfolio"   class="nav-link"        data-tab="portfolio">Portfolio</a>
       <a href="#shop"        class="nav-link"        data-tab="shop">Shop</a>
       <a href="#about"       class="nav-link"        data-tab="about">About</a>
       <a href="#cv"          class="nav-link"        data-tab="cv">CV</a>
@@ -1017,8 +1017,8 @@
     </div>
   </section>
 
-  <!-- ══════════════════════ CERAMICS ══════════════════════ -->
-  <section id="tab-ceramics" class="tab-panel hidden">
+  <!-- ══════════════════════ PORTFOLIO ══════════════════════ -->
+  <section id="tab-portfolio" class="tab-panel hidden">
 
     <div class="video-feed">
 
@@ -1221,7 +1221,12 @@
     });
 
     // Restore tab from URL path on load
-    const path = location.pathname.replace(/^\//, '').replace(/\/$/, '') || 'home';
+    let path = location.pathname.replace(/^\//, '').replace(/\/$/, '') || 'home';
+    // Old /ceramics links now point to the Portfolio tab
+    if (path === 'ceramics') {
+      path = 'portfolio';
+      history.replaceState(null, '', '/portfolio');
+    }
     if (path !== 'home' && document.getElementById('tab-' + path)) {
       switchTab(path);
     } else {
